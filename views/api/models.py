@@ -37,6 +37,8 @@ class Geo(db.Model):
         self.t_151 = record.get("151")
         self.t_550 = record.get("550")
         self.t_670 = record.get("670")
+        self.t_781 = record.get("781")
+
 
     def __str__(self) -> str:
         result = {}
