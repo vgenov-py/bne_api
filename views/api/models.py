@@ -1,9 +1,5 @@
 from db import db
-from uuid import uuid4
-import datetime as dt
-from hashlib import sha1
-from constants import  SECRET_KEY
-from sqlalchemy.dialects.mysql import LONGTEXT
+import re
 
 class Geo(db.Model):
     __tablename__ = "geographic"
@@ -21,6 +17,8 @@ class Geo(db.Model):
     t_151 = db.Column(db.String(255))
     t_550 = db.Column(db.String(100))
     t_670 = db.Column(db.String(255))
+    t_781 = db.Column(db.String(100))
+    lat_lng = db.Column(db.String(100))
 
     def __init__(self, record:dict) -> None:
         self.id = record.get("001")
@@ -38,7 +36,31 @@ class Geo(db.Model):
         self.t_550 = record.get("550")
         self.t_670 = record.get("670")
         self.t_781 = record.get("781")
+        self.lat_lng = self.f_lat_lng(record.get("034")) if self.f_lat_lng(record.get("034")) else None
 
+    def f_lat_lng(self, v):
+        re_coord = "\w{2}\d{1,}"
+        result = ""
+        try:
+            a = re.findall(re_coord, v)
+            for i, coord in enumerate(a):
+                if i % 2 == 0:
+                    coord = coord[1:]
+                    c_point = coord[0]
+                    digits = coord[1:]
+                    n = float(f"{digits[0:3]}.{digits[3:]}")
+                    if c_point == "W" or c_point == "E":
+                        if c_point == "W":
+                            n = -n
+                        result += f"{n}"
+                    else:
+                        if c_point == "S":
+                            n = -n
+                        result += f", {n}"
+        
+            return result
+        except:
+            return None
 
     def __str__(self) -> str:
         result = {}

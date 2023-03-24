@@ -4,6 +4,7 @@ from db import db
 from sqlalchemy import text
 import time
 import sqlite3
+import json
 
 def dict_factory(cursor, row):
     d = {}
@@ -27,13 +28,20 @@ models = {"per":Per, "geo": Geo, "per_table": "person", "geo_table": "geographic
 @api.route("/<model>")
 def r_geo(model):
 
-    def public(record): 
+    def per_public(record): 
         result = {}
         result["ID_BNE"] =  record.get("id")
         result["Fuentes"] =  record.get("")
         result["Nombre"] = record.get("t_100")
         result["Género"] = record.get("t_375")
         result["Mas cosas"] =  record.get("")
+        return result
+    
+    def geo_public(record): 
+        result = {}
+        result["ID_BNE"] =  record.get("id")
+        result["Nombre"] =  record.get("t_781")
+        result["lat_lng"] = record.get("lat_lng")
         return result
 
     model_name = models.get(f"{model}_table")
@@ -43,29 +51,6 @@ def r_geo(model):
         t,v = tuple(*args.items())
     except Exception as e:
         pass
-    # with open("converter/persona1.json", encoding="utf-8") as file:
-    #     data = json.load(file)
-    #     # def gen_record(record):
-    #     #     record["001"] = record.get("001")[2:]
-    #     #     try:
-    #     #         yield model(record)
-    #     #     except Exception as e:
-    #     #         e
-    #     for record in data[70000:]:
-    #         record["001"] = record.get("001")[2:]
-    #         # query= f'''
-    #         #     INSERT OR IGNORE INTO person (id, t_003, t_005, t_008, t_024, t_046, t_100, t_368, t_370, t_372, t_373, t_374, t_375, t_377, t_400, t_500, t_670) VALUES {tuple(record.values())};
-    #         # '''
-    #         try:
-    #             record = model(record)
-    #             db.session.add(record)
-    #         except Exception as e:
-    #             print(e)
-    #         try:
-    #             db.session.commit()
-    #         except Exception as e:
-    #             print(e)
-        # db.session.bulk_save_objects(map(lambda record: gen_record(record),data))
     start = time.perf_counter()
     # a = model.query.filter_by(t_375="|aMasculino").all()
     # a = [record.public() for record in a[0:100]]
@@ -81,8 +66,34 @@ def r_geo(model):
     print(query)
     res = cur.execute(query)
     result = res.fetchall()
-    to_show = [public(record) for record in result[0:10]]
+    if model_name.find("per") >= 0:
+        to_show = [per_public(record) for record in result[0:10]]
+    else:
+        to_show = [geo_public(record) for record in result[0:10]]
+
     finish = time.perf_counter()
     total_t = finish-start
     data = {"time": total_t, "length": len(result), "data": to_show}
     return data
+
+@api.route("/entry/<model>")
+def r_entry_data(model):
+    model = models.get(model)
+    with open("converter/geografico.json", encoding="utf-8") as file:
+        data = json.load(file)
+        for record in data:
+            record["001"] = record.get("001")[2:]
+            # query= f'''
+            #     INSERT OR IGNORE INTO person (id, t_003, t_005, t_008, t_024, t_046, t_100, t_368, t_370, t_372, t_373, t_374, t_375, t_377, t_400, t_500, t_670) VALUES {tuple(record.values())};
+            # '''
+            try:
+                record = model(record)
+                db.session.add(record)
+            except Exception as e:
+                print(e)
+            try:
+                db.session.commit()
+            except Exception as e:
+                print(e)
+    res = {"success": True}
+    return res
