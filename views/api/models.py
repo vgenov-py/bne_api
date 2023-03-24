@@ -65,7 +65,6 @@ class Per(db.Model):
     t_024 = db.Column(db.String(255))
     t_046 = db.Column(db.String(255))
     t_100 = db.Column(db.String(255))
-    t_400 = db.Column(db.String(255))
     t_368 = db.Column(db.String(255))
     t_370 = db.Column(db.String(255))
     t_372 = db.Column(db.String(255))
@@ -73,6 +72,7 @@ class Per(db.Model):
     t_374 = db.Column(db.String(255))
     t_375 = db.Column(db.String(255))
     t_377 = db.Column(db.String(255))
+    t_400 = db.Column(db.String(255))
     t_500 = db.Column(db.String(255))
     t_670 = db.Column(db.String(255))
 
