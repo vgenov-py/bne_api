@@ -13,6 +13,7 @@ def dict_factory(cursor, row):
 
 api = Blueprint("api", __name__)
 '''
+
 sqlite3 instance/xray.db .dump > back.sql
 sqlite3 instance/xray.db < back.sql
 mysqldump -u root xray --no-create-info > back_info.sql
