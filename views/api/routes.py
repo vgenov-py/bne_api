@@ -22,7 +22,7 @@ mysql -u vgenovpy -h vgenovpy.mysql.eu.pythonanywhere-services.com 'vgenovpy$xra
 mysql -u root -p xray < back.sql
 '''
 
-models = {"per":Per, "geo": Geo}
+models = {"per":Per, "geo": Geo, "per_table": "person", "geo_table": "geographic"}
 
 @api.route("/<model>")
 def r_geo(model):
@@ -36,6 +36,7 @@ def r_geo(model):
         result["Mas cosas"] =  record.get("")
         return result
 
+    model_name = models.get(f"{model}_table")
     model = models.get(model)
     args = request.args
     try:
@@ -71,10 +72,8 @@ def r_geo(model):
     con = sqlite3.connect("instance/bne.db")
     con.row_factory = dict_factory
     cur = con.cursor()
-    # res = cur.execute(f'''SELECT * FROM person where t_{t} = "{v}"''')
-    # res = cur.execute(f'''SELECT * FROM person where instr(t_{t}, '{v}') > 0''')
     def create_query(args:dict) -> str:
-        query = "SELECT * FROM person WHERE "
+        query = f"SELECT * FROM {model_name} WHERE "
         for k,v in args.items():
             query += f"t_{k} LIKE '%{v}%' AND "
         return f"{query[0:-5]};"
