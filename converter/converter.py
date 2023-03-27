@@ -2,8 +2,8 @@ import json
 import os
 from concurrent.futures import ThreadPoolExecutor
 
-file_name = "converter/geografico_flat.txt"
-file_to_write ="converter/geografico.json"
+file_name = "converter/monomodernas003.txt"
+file_to_write ="converter/monomodernas.json"
 
 if __name__ == '__main__':
     import time
