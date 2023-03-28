@@ -1,4 +1,4 @@
-from flask import Blueprint,  request
+from flask import Blueprint,  request, render_template
 from views.api.models import Mapper
 from db import get_db
 import time
@@ -23,6 +23,10 @@ mysql -u root -p xray < back.sql
 '''
 
 # models = {"per":Per, "geo": Geo}
+
+@api.route("/")
+def r_home():
+    return render_template("index.html")
 
 @api.route("/<model>")
 def r_geo(model):
