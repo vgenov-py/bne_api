@@ -1,7 +1,6 @@
 from flask import Blueprint,  request
-from views.api.models import  Geo, Per
-from db import db
-from sqlalchemy import text
+from views.api.models import Mapper
+from db import get_db
 import time
 import sqlite3
 import json
@@ -15,15 +14,15 @@ def dict_factory(cursor, row):
 api = Blueprint("api", __name__)
 '''
 
-sqlite3 instance/xray.db .dump > back.sql
-sqlite3 instance/xray.db < back.sql
+sqlite3 instance/bne.db .dump > back.sql
+sqlite3 instance/bne.db < back.sql
 mysqldump -u root xray --no-create-info > back_info.sql
 mysqldump -u vgenovpy -h vgenovpy.mysql.eu.pythonanywhere-services.com --set-gtid-purged=OFF --no-tablespaces 'vgenovpy$xray'  > backup.sql
 mysql -u vgenovpy -h vgenovpy.mysql.eu.pythonanywhere-services.com 'vgenovpy$xray'  < back.sql
 mysql -u root -p xray < back.sql
 '''
 
-models = {"per":Per, "geo": Geo, "per_table": "person", "geo_table": "geographic"}
+# models = {"per":Per, "geo": Geo}
 
 @api.route("/<model>")
 def r_geo(model):
@@ -44,8 +43,7 @@ def r_geo(model):
         result["lat_lng"] = record.get("lat_lng")
         return result
 
-    model_name = models.get(f"{model}_table")
-    model = models.get(model)
+    # model = models.get(model)
     args = request.args
     try:
         t,v = tuple(*args.items())
@@ -58,18 +56,18 @@ def r_geo(model):
     con.row_factory = dict_factory
     cur = con.cursor()
     def create_query(args:dict) -> str:
-        query = f"SELECT * FROM {model_name} WHERE "
+        query = f"SELECT * FROM {model} WHERE "
         for k,v in args.items():
             query += f"t_{k} LIKE '%{v}%' AND "
         return f"{query[0:-5]};"
     query = create_query(args)
-    print(query)
     res = cur.execute(query)
     result = res.fetchall()
-    if model_name.find("per") >= 0:
+    if model.find("per") >= 0:
         to_show = [per_public(record) for record in result[0:10]]
     else:
         to_show = [geo_public(record) for record in result[0:10]]
+    to_show = result[0:10]
 
     finish = time.perf_counter()
     total_t = finish-start
@@ -77,23 +75,23 @@ def r_geo(model):
     return data
 
 @api.route("/entry/<model>")
-def r_entry_data(model):
-    model = models.get(model)
-    with open("converter/geografico.json", encoding="utf-8") as file:
+def r_entry_data_2(model):
+    start = time.perf_counter()
+    con = get_db()
+    cur = con.cursor()
+    inserter = Mapper()
+    with open(f"converter/{model}.json", encoding="utf-8") as file:
         data = json.load(file)
-        for record in data:
-            record["001"] = record.get("001")[2:]
-            # query= f'''
-            #     INSERT OR IGNORE INTO person (id, t_003, t_005, t_008, t_024, t_046, t_100, t_368, t_370, t_372, t_373, t_374, t_375, t_377, t_400, t_500, t_670) VALUES {tuple(record.values())};
-            # '''
-            try:
-                record = model(record)
-                db.session.add(record)
-            except Exception as e:
-                print(e)
-            try:
-                db.session.commit()
-            except Exception as e:
-                print(e)
-    res = {"success": True}
+        columns = len(tuple(cur.execute(f"pragma table_info({model});")))
+        query = f"insert or ignore into {model} values ({'?, '*columns})"
+        query = query.replace(", )", ")")
+        cur.executemany(query,map(lambda record: inserter.extract_values(model, record), data))
+        con.commit()
+    finish = time.perf_counter()
+    res = {"success": True, "time": finish-start}
     return res
+
+@api.route("/test")
+def r_test():
+    db = get_db()
+    return "TEST"
