@@ -28,35 +28,13 @@ mysql -u root -p xray < back.sql
 def r_geo(model):
     limit = request.args.get("limit")
     limit = limit if limit else 1000
-
-    def per_public(record): 
-        result = {}
-        result["ID_BNE"] =  record.get("id")
-        result["Fuentes"] =  record.get("")
-        result["Nombre"] = record.get("t_100")
-        result["Género"] = record.get("t_375")
-        result["Mas cosas"] =  record.get("")
-        return result
-    
-    def geo_public(record): 
-        result = {}
-        result["ID_BNE"] =  record.get("id")
-        result["Nombre"] =  record.get("t_781")
-        result["lat_lng"] = record.get("lat_lng")
-        return result
-
-    # model = models.get(model)
     args = request.args
     try:
         t,v = tuple(*args.items())
     except Exception as e:
         pass
     start = time.perf_counter()
-    # a = model.query.filter_by(t_375="|aMasculino").all()
-    # a = [record.public() for record in a[0:100]]
-    con = sqlite3.connect("instance/bne.db")
-    con.row_factory = dict_factory
-    cur = con.cursor()
+    cur = get_db().cursor()
     def create_query(args:dict) -> str:
         fields = request.args.get("fields")
         if fields:
@@ -84,10 +62,11 @@ def r_geo(model):
             else:
                 return
             counter += 1
-    result = list(get_results_limit(res, limit))
     finish = time.perf_counter()
     total_t = finish-start
-    data = {"time": total_t, "length": len(result), "data": result}
+    result = list(get_results_limit(res, limit))
+    data =  {"success":True, "data": result}
+    data["time"] = total_t
     return data
 
 @api.route("/entry/<model>")
