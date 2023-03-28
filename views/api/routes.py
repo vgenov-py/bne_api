@@ -63,10 +63,9 @@ def r_geo(model):
                 return
             counter += 1
     finish = time.perf_counter()
-    total_t = finish-start
     result = list(get_results_limit(res, limit))
-    data =  {"success":True, "data": result}
-    data["time"] = total_t
+    total_t = finish-start
+    data =  {"success":True, "time": total_t, "length": len(result), "data": result}
     return data
 
 @api.route("/entry/<model>")
