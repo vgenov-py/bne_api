@@ -1,5 +1,6 @@
 # from db import db
 import re
+from uuid import uuid4
 
 query_create_geo = f'''
     CREATE TABLE geo (
@@ -52,6 +53,25 @@ query_create_per = f'''
     t_400 TEXT,
     t_500 TEXT,
     t_670 TEXT
+    );
+'''
+
+query_create_mon = f'''
+    CREATE TABLE mon (
+    id TEXT PRIMARY KEY,
+    t_001 TEXT,
+    t_035 TEXT,
+    t_040 TEXT,
+    t_100 TEXT,
+    t_130 TEXT,
+    t_245 TEXT,
+    t_260 TEXT,
+    t_300 TEXT,
+    t_500 TEXT,
+    t_899 TEXT,
+    t_927 TEXT,
+    t_980 TEXT,
+    t_994 TEXT
     );
 '''
 
@@ -122,6 +142,23 @@ class Mapper:
             result.append(record.get("377"))
             result.append(record.get("500"))
             result.append(record.get("670"))
+
+        elif dataset == "mon":
+            result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
+            result.append(record.get("001"))
+            result.append(record.get("035"))
+            result.append(record.get("040"))
+            result.append(record.get("100"))
+            result.append(record.get("130"))
+            result.append(record.get("245"))
+            result.append(record.get("260"))
+            result.append(record.get("300"))
+            result.append(record.get("500"))
+            result.append(record.get("899"))
+            result.append(record.get("927"))
+            result.append(record.get("980"))
+            result.append(record.get("994"))
+            
         return tuple(result)
     
     def dollar_parser(self, value: str) -> str:

@@ -1,5 +1,21 @@
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
+CREATE TABLE mon (
+    id TEXT PRIMARY KEY,
+    t_001 TEXT,
+    t_035 TEXT,
+    t_040 TEXT,
+    t_100 TEXT,
+    t_130 TEXT,
+    t_245 TEXT,
+    t_260 TEXT,
+    t_300 TEXT,
+    t_500 TEXT,
+    t_899 TEXT,
+    t_927 TEXT,
+    t_980 TEXT,
+    t_994 TEXT
+    );
 CREATE TABLE per (
     id TEXT PRIMRAY KEY,
     t_001 TEXT,

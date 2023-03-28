@@ -32,4 +32,4 @@ if "kuga" in app.root_path:
 else:
     app = create_app()
     if not os.path.isfile(DB_FILE):
-        set_db(app)
+        set_db()

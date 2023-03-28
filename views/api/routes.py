@@ -26,6 +26,8 @@ mysql -u root -p xray < back.sql
 
 @api.route("/<model>")
 def r_geo(model):
+    limit = request.args.get("limit")
+    limit = limit if limit else 1000
 
     def per_public(record): 
         result = {}
@@ -56,22 +58,36 @@ def r_geo(model):
     con.row_factory = dict_factory
     cur = con.cursor()
     def create_query(args:dict) -> str:
-        query = f"SELECT * FROM {model} WHERE "
+        fields = request.args.get("fields")
+        if fields:
+            query = f"SELECT {fields} FROM {model} WHERE "
+        else:
+            query = f"SELECT * FROM {model} WHERE "
+
         for k,v in args.items():
-            query += f"t_{k} LIKE '%{v}%' AND "
+            if k in ["limit", "fields"]:
+                continue
+            if k.isdigit():
+                query += f"t_{k} LIKE '%{v}%' AND "
+            else:
+                query += f"{k} LIKE '%{v}%' AND "
+
         return f"{query[0:-5]};"
     query = create_query(args)
     res = cur.execute(query)
-    result = res.fetchall()
-    if model.find("per") >= 0:
-        to_show = [per_public(record) for record in result[0:10]]
-    else:
-        to_show = [geo_public(record) for record in result[0:10]]
-    to_show = result[0:10]
-
+    def get_results_limit(data, limit: int):
+        limit = int(limit)
+        counter = 0
+        for record in data:
+            if counter < limit:
+                yield record
+            else:
+                return
+            counter += 1
+    result = list(get_results_limit(res, limit))
     finish = time.perf_counter()
     total_t = finish-start
-    data = {"time": total_t, "length": len(result), "data": to_show}
+    data = {"time": total_t, "length": len(result), "data": result}
     return data
 
 @api.route("/entry/<model>")
