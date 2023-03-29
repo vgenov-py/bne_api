@@ -1,6 +1,6 @@
 from flask import Blueprint,  request, render_template
 from views.api.models import Mapper
-from db import get_db
+from db import get_db, QMO
 import time
 import sqlite3
 import json
@@ -29,7 +29,7 @@ def r_home():
     return render_template("index.html")
 
 @api.route("/<model>")
-def r_geo(model):
+def r_dataset(model):
     limit = request.args.get("limit")
     limit = limit if limit else 1000
     args = request.args
@@ -74,22 +74,10 @@ def r_geo(model):
 
 @api.route("/entry/<model>")
 def r_entry_data_2(model):
-    start = time.perf_counter()
-    con = get_db()
-    cur = con.cursor()
-    inserter = Mapper()
-    with open(f"converter/{model}.json", encoding="utf-8") as file:
-        data = json.load(file)
-        columns = len(tuple(cur.execute(f"pragma table_info({model});")))
-        query = f"insert or ignore into {model} values ({'?, '*columns})"
-        query = query.replace(", )", ")")
-        cur.executemany(query,map(lambda record: inserter.extract_values(model, record), data))
-        con.commit()
-    finish = time.perf_counter()
-    res = {"success": True, "time": finish-start}
-    return res
+    test_QMO = QMO(model, f"converter/{model}.json")
+    return test_QMO.insert()
 
 @api.route("/test")
 def r_test():
-    db = get_db()
-    return "TEST"
+    test_QMO = QMO("per", request.args)
+    return test_QMO.query()
