@@ -1,0 +1,18 @@
+import csv
+
+file = open("enrichment/370_781.txt", encoding="utf-8")
+headers = ["per_id", "per_370", "geo_id", "geo_781"]
+to_write = []
+for line in file:
+    line = line.split("/**/")
+    to_replace = line.pop(-1)
+    to_replace = to_replace.replace("|z", "|a", 1)
+    to_replace = to_replace.replace("|z", ", ")
+    to_replace = to_replace.strip()
+    line.append(to_replace)
+    to_write.append(line)
+with open("enrichment/370_781.csv", "w", encoding="utf-8") as csv_file:
+    csv_writer = csv.writer(csv_file)
+    csv_writer.writerow(headers)
+    csv_writer.writerows(to_write)
+file.close()
