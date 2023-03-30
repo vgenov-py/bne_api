@@ -34,10 +34,8 @@ message: str
 "data": [
     {
     "id":"XX450536",
-    "lugar_jerarquico": "España, Cataluña",
-    ...
-    },
-    ...
+    "lugar_jerarquico": "España, Cataluña"
+    }
 ]
 ```
 ## Parámetros opcionales:
@@ -67,8 +65,7 @@ Ejemplo de respuesta:
     {
     "id":"XX450536",
     "t_024": "|ahttp://id.loc.gov/authorities/names/n79089624|2lcnaf /**/ |ahttp://viaf.org/viaf/316429160|2viaf"
-    },
-    ...
+    }
 ]
 ```
 
@@ -108,10 +105,25 @@ GET /geo?lugar_jerarquico=esp
 "data": [
     {
     "id":"XX450537",
-    "lugar_jerarquico": "España, Andalucía",
-    ...
-    },
-    ...
+    "lugar_jerarquico": "España, Andalucía"
+    }
+]
+```
+
+* Es posible hacer búsquedas "negativas", para éste cometido agregar <strong>!</strong> al principio del valor.
+Ejemplo de respuesta:
+```js
+GET /geo?lugar_jerarquico=!esp
+```
+```json
+"success": true,
+"length": 1000,
+"time": 0.0123...,
+"data": [
+    {
+    "id":"XX450557",
+    "lugar_jerarquico": "Gran Bretaña, Escocia"
+    }
 ]
 ```
 
