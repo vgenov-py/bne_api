@@ -4,7 +4,7 @@ from flask import g
 import re
 import json
 import time
-
+from uuid import uuid4
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
@@ -111,6 +111,7 @@ class QMO:
             result.append(record.get("377"))
             result.append(record.get("500"))
             result.append(record.get("670"))
+            result.append(self.per_geo_id(record.get("370")))
 
         elif dataset == "mon":
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
@@ -197,6 +198,17 @@ class QMO:
         except:
             return None
 
+    def per_geo_id(self, v: str) -> str:
+        '''
+        This would get de geo id from the 370's
+        '''
+        if v: 
+            result = re.findall("XX\d{4,7}", v)
+            if len(result):
+                return result[0]
+        else:
+            return        
+
     @property
     def purgue(self):
         res_json = self.res_json
@@ -214,7 +226,6 @@ class QMO:
             field:str = field.strip()
             if field not in self.available_fields:
                 res_json["message"] = f"This field doesn't exist in the db: {field} - available fields: {self.available_fields}"
-                # res_json["available_fields"] = f"{self.available_fields}"
                 return res_json
         res_json["fields"] = fields
         
@@ -238,6 +249,8 @@ class QMO:
         for k,v in res_json["args"].items():
             if v == "null":
                 query += f"{k} is NULL AND "
+            elif v.startswith("!"):
+                query += f"{k} NOT LIKE '%{v[1:]}%' AND "
             else:
                 query += f"{k} LIKE '%{v}%' AND "
         
