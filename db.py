@@ -68,7 +68,7 @@ class QMO:
             result.append(record.get("781"))
             humans = []
             humans.append(self.dollar_parser(record.get("001"))  if record.get("001") else None)
-            humans.append(self.other_identifiers(record.get("024"))  if record.get("024") else None)
+            humans.append(self.other_identifiers(record.get("024")))
             humans.append(self.f_lat_lng(record.get("034")) if self.f_lat_lng(record.get("034")) else None)
             #CDU:
             humans.append(self.dollar_parser(record.get("080")) if record.get("080") else None)
@@ -95,9 +95,6 @@ class QMO:
         elif dataset == "per":
             result.append(record.get("001")[2:])
             result.append(record.get("001"))
-            result.append(record.get("003"))
-            result.append(record.get("005"))
-            result.append(record.get("008"))
             result.append(record.get("024"))
             result.append(record.get("046"))
             result.append(record.get("100"))
@@ -107,11 +104,59 @@ class QMO:
             result.append(record.get("373"))
             result.append(record.get("374"))
             result.append(record.get("375"))
-            result.append(record.get("400"))
             result.append(record.get("377"))
+            result.append(record.get("400"))
             result.append(record.get("500"))
+            result.append(record.get("510"))
+            result.append(record.get("667"))
             result.append(record.get("670"))
-            result.append(self.per_geo_id(record.get("370")))
+            result.append(record.get("678"))
+            #HUMANS:
+            result.append(self.get_single_dollar(record.get("001"),"a"))
+            # otros_identificadores
+            result.append(self.other_identifiers(record.get("024")))
+            # fecha de nacimiento
+            result.append(self.get_single_dollar(record.get("046"), "f"))
+            # fecha de muerte
+            result.append(self.get_single_dollar(record.get("046"), "g"))
+            # nombre de persona
+            result.append(self.per_person_name(record.get("100")))
+            # otros atributos persona
+            result.append(self.per_other_attributes(record.get("368")))
+            #lugar de nacimiento
+            result.append(self.get_single_dollar(record.get("370"), "a"))
+            #lugar de muerte
+            result.append(self.get_single_dollar(record.get("370"), "b"))
+            #país relacionado
+            result.append(self.get_single_dollar(record.get("370"), "c"))
+            #otros lugares relacionados
+            result.append(self.get_single_dollar(record.get("370"), "f"))
+            #lugar residencia
+            result.append(self.get_single_dollar(record.get("370"), "e"))
+            #campo_actividad
+            result.append(self.get_single_dollar(record.get("372"), "a"))
+            #grupo o entidad relacionada
+            result.append(self.dollar_parser(record.get("373")))
+            #ocupacion
+            result.append(self.get_single_dollar(record.get("374"), "a"))
+            #género
+            result.append(self.get_single_dollar(record.get("375"), "a"))
+            #lengua
+            result.append(self.get_single_dollar(record.get("377"), "l"))
+            #otros nombres
+            result.append(self.per_person_name(record.get("400")))
+            #persona relacionada
+            result.append(self.per_person_name(record.get("500")))
+            #grupo o entidad relacionada
+            result.append(self.dollar_parser(record.get("510")))
+            #nota general
+            result.append(self.dollar_parser(record.get("667")))
+            #fuentes de información
+            result.append(self.per_other_sources(record.get("670")))
+            #otros datos biográficos
+            result.append(self.dollar_parser(record.get("678")))
+            #obras relacionadas en el catálogo BNE
+            result.append(self.gen_url(record.get("001")))
 
         elif dataset == "mon":
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
@@ -132,12 +177,16 @@ class QMO:
         return tuple(result)
     
     def dollar_parser(self, value: str) -> str:
+        if not value:
+            return None
         re_dollar = "\|\w{1}"
         result = re.sub(re_dollar, "", value, 1)
         result = re.sub(re_dollar, ", ", result)
         return result
     
     def other_identifiers(self, value:str) -> str:
+        if not value:
+            return None
         result = ""
         value_splitted = value.split(self.splitter)
         for v_s in value_splitted:
@@ -209,6 +258,59 @@ class QMO:
         else:
             return        
 
+    def get_single_dollar(self, value:str, dollar: str) -> str:
+        if not value:
+            return None
+        re_selected_dollar = f"\|{dollar}([ \S]*?)\||\|{dollar}([ \S+]+)"
+        value = re.search(re_selected_dollar, value)
+        if value:
+             for match in value.groups():
+                  if match:
+                       return match
+    
+    def per_person_name(self, value: str) -> str:
+        if not value:
+            return
+        dollar_a = self.get_single_dollar(value, "a")
+        result = f"{dollar_a}"
+        dollar_b = self.get_single_dollar(value, "b")
+        if dollar_b:
+            result += f", {dollar_b}"
+        dollar_c = self.get_single_dollar(value, "c")
+        if dollar_c:
+            result += f", {dollar_c}"
+        dollar_d = self.get_single_dollar(value, "d")
+        if dollar_d:
+            result += f", ({dollar_d})" 
+        dollar_q = self.get_single_dollar(value, "q")
+        if dollar_q:
+            result += f", ({dollar_q})"
+        return result
+    
+    def per_other_attributes(self, value:str) -> str:
+        if not value:
+            return
+        result = ""
+        dollar_c = self.get_single_dollar(value, "c")
+        if dollar_c:
+            result += f", {dollar_c}"
+        dollar_d = self.get_single_dollar(value, "d")
+        if dollar_d:
+            result += f", {dollar_d}"
+        return result
+        
+    def per_other_sources(self, value:str) -> str:
+        if not value:
+            return
+        dollar_a = self.get_single_dollar(value, "a")
+        dollar_b = self.get_single_dollar(value, "b")
+        dollar_u = self.get_single_dollar(value, "u")
+        if dollar_a and dollar_b:
+            result = f"{dollar_a}: {dollar_b}"
+            if dollar_u:
+                result += f" ({dollar_u})"
+            return result
+    
     @property
     def purgue(self):
         res_json = self.res_json
@@ -244,7 +346,6 @@ class QMO:
         if not res_json["success"]:
             return {"success":False,"message":res_json["message"]}
         fields = res_json['fields'] if res_json['fields'] else '*'
-        # query = f"SELECT {fields} FROM {self.dataset}  LIMIT {res_json['limit']};"
         query = f"SELECT {fields} FROM {self.dataset} WHERE "
         for k,v in res_json["args"].items():
             if v == "null":

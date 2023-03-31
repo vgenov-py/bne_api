@@ -53,6 +53,52 @@ query_create_per = f'''
     );
 '''
 
+query_create_per_human = f'''
+    CREATE TABLE per (
+    id TEXT PRIMRAY KEY,
+    t_001 TEXT,
+    t_024 TEXT,
+    t_046 TEXT,
+    t_100 TEXT,
+    t_368 TEXT,
+    t_370 TEXT,
+    t_372 TEXT,
+    t_373 TEXT,
+    t_374 TEXT,
+    t_375 TEXT,
+    t_377 TEXT,
+    t_400 TEXT,
+    t_500 TEXT,
+    t_510 TEXT,
+    t_667 TEXT,
+    t_670 TEXT,
+    t_678 TEXT,
+    id_BNE TEXT,
+    otros_identificadores TEXT,
+    fecha_nacimiento TEXT,
+    fecha_muerte TEXT,
+    nombre_de_persona TEXT,
+    otros_atributos_persona TEXT,
+    lugar_nacimiento TEXT,
+    lugar_muerte TEXT,
+    pais_relacionado TEXT,
+    otros_lugares_relacionados TEXT,
+    lugar_residencia TEXT,
+    campo_actividad TEXT,
+    grupo_o_entidad_relacionada TEXT,
+    ocupacion TEXT,
+    genero TEXT,
+    lengua TEXT,
+    otros_nombres TEXT,
+    persona_relacionada TEXT,
+    grupo_o_entidad_relacionada_ TEXT,
+    nota_general TEXT,
+    fuentes_de_informacion TEXT,
+    otros_datos_biograficos TEXT,
+    obras_relacionadas_en_el_catalogo_BNE TEXT
+    );
+'''
+
 query_create_mon = f'''
     CREATE TABLE mon (
     id TEXT PRIMARY KEY,
