@@ -156,7 +156,7 @@ class QMO:
             #otros datos biográficos
             result.append(self.dollar_parser(record.get("678")))
             #obras relacionadas en el catálogo BNE
-            result.append(self.gen_url(record.get("001")))
+            result.append(self.per_gen_url(record.get("001")))
 
         elif dataset == "mon":
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
@@ -311,6 +311,11 @@ class QMO:
                 result += f" ({dollar_u})"
             return result
     
+    def per_gen_url(self, value: str) -> str:
+        result = "http://catalogo.bne.es/uhtbin/cgisirsi/0/x/0/05?searchdata1=%5ea"
+        result += value[4:]
+        return result   
+
     @property
     def purgue(self):
         res_json = self.res_json
