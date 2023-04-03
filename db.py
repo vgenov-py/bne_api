@@ -42,6 +42,22 @@ class QMO:
         return res
     
     @property
+    def marc_fields(self) -> tuple:
+        result = ""
+        res = filter(lambda column: column["name"].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column["name"], res):
+            result += f", {t}"
+        return result[2:]
+    
+    @property
+    def human_fields(self) -> tuple:
+        result = ""
+        res = filter(lambda column: not column["name"].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column["name"], res):
+            result += f", {t}"
+        return result[2:]
+        
+    @property
     def splitter(self):
         return " /**/ "
     
@@ -335,6 +351,7 @@ class QMO:
         args = self.args.copy()
         fields = args.pop("fields", None)
         limit = args.pop("limit", "1000")
+        view = args.pop("view", False)
         if limit:
             try:
                  int(limit)
@@ -353,6 +370,11 @@ class QMO:
         if not_available_field:
             res_json["message"] = f"This field doesn't exist in the db: {not_available_field[0]}  - available fields: {self.available_fields}"
             return res_json
+        if view:
+            if view == "marc":
+                res_json["fields"] = self.marc_fields
+            elif view == "human":
+                res_json["fields"] = self.human_fields
         res_json["args"] = args
         res_json["success"] = True
         return res_json
@@ -360,9 +382,9 @@ class QMO:
     def query(self):
         start = self.time
         res_json = self.purgue
-        print(res_json)
         if not res_json["success"]:
             return {"success":False,"message":res_json["message"]}
+        
         fields = res_json['fields'] if res_json['fields'] else '*'
         query = f"SELECT {fields} FROM {self.dataset} WHERE "
         for k,v in res_json["args"].items():
