@@ -20,7 +20,7 @@ length: integer
 time: float
 data: array 
 ```
-* Caso fallido
+* Caso fallido:
 ```
 success: boolean
 message: str
@@ -113,7 +113,7 @@ GET /geo?lugar_jerarquico=esp
 ]
 ```
 
-* Por defecto todo filtri, será agregado con un operador <strong>AND</strong>, si queremos utilizar el operador <strong>OR</strong> agregar <strong>||</strong> al final del valor 
+* Por defecto todo filtro, será agregado con un operador <strong>AND</strong>, si queremos utilizar el operador <strong>OR</strong>, agregar <strong>||</strong> al final del valor 
 
 Ejemplo de respuesta:
 ```js

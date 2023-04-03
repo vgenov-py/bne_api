@@ -373,7 +373,7 @@ class QMO:
             if is_multiple:
                 v_or_and_splitted = v.split("||")
                 pre = ""
-                if len(v_or_and_splitted) > 1:
+                if len(v_or_and_splitted) >= 1:
                     for v_o_a in v_or_and_splitted:
                         pre += f" {k} LIKE '%{v_o_a}%' OR "
                 pre = pre[0:-4]
