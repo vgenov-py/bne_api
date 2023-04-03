@@ -1,5 +1,6 @@
-query_create_geo = f'''
-    CREATE TABLE geo (
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE geo (
         id TEXT PRIMARY KEY,
         t_001 TEXT,
         t_024 TEXT,
@@ -27,10 +28,7 @@ query_create_geo = f'''
         lugar_jerarquico TEXT,
         obras_relacionadas_en_el_catalogo_BNE TEXT
     );
-'''
-
-query_create_per_human = f'''
-    CREATE TABLE per (
+CREATE TABLE per (
     id TEXT PRIMRAY KEY,
     t_001 TEXT,
     t_024 TEXT,
@@ -72,10 +70,7 @@ query_create_per_human = f'''
     otros_datos_biograficos TEXT,
     obras_relacionadas_en_el_catalogo_BNE TEXT
     );
-'''
-
-query_create_mon = f'''
-    CREATE TABLE mon (
+CREATE TABLE mon (
     id TEXT PRIMARY KEY,
     t_001 TEXT,
     t_035 TEXT,
@@ -91,4 +86,4 @@ query_create_mon = f'''
     t_980 TEXT,
     t_994 TEXT
     );
-'''
+COMMIT;

@@ -136,9 +136,9 @@ class QMO:
             #campo_actividad
             result.append(self.get_single_dollar(record.get("372"), "a"))
             #grupo o entidad relacionada
-            result.append(self.dollar_parser(record.get("373")))
+            result.append(self.group_or_entity(record))
             #ocupacion
-            result.append(self.get_single_dollar(record.get("374"), "a"))
+            result.append(self.dollar_parser(record.get("374")))
             #género
             result.append(self.get_single_dollar(record.get("375"), "a"))
             #lengua
@@ -147,8 +147,6 @@ class QMO:
             result.append(self.per_person_name(record.get("400")))
             #persona relacionada
             result.append(self.per_person_name(record.get("500")))
-            #grupo o entidad relacionada
-            result.append(self.dollar_parser(record.get("510")))
             #nota general
             result.append(self.dollar_parser(record.get("667")))
             #fuentes de información
@@ -316,6 +314,21 @@ class QMO:
         result += value[4:]
         return result   
 
+    def group_or_entity(self, record:dict) -> str:
+        t_373 = record.get("373")
+        t_510 = record.get("510")
+        if not t_373 and not t_510:
+            return
+        result = ""
+        if t_373:
+            t_373 = self.dollar_parser(t_373)
+            for value in t_373.split("/**/"):
+                result += value.split(", ")[0]
+        if t_510:
+            t_510 = self.dollar_parser(t_510)
+            result += f"{self.splitter}{t_510}"
+        return result
+
     @property
     def purgue(self):
         res_json = self.res_json
@@ -353,12 +366,25 @@ class QMO:
         fields = res_json['fields'] if res_json['fields'] else '*'
         query = f"SELECT {fields} FROM {self.dataset} WHERE "
         for k,v in res_json["args"].items():
-            if v == "null":
-                query += f"{k} is NULL AND "
-            elif v.startswith("!"):
-                query += f"{k} NOT LIKE '%{v[1:]}%' AND "
+            is_multiple = True if v.find("||") >= 0 else False
+            and_or = "OR " if v[-2:] == "||" else "AND"
+            if and_or == "OR ":
+                v = v[0:-2]
+            if is_multiple:
+                v_or_and_splitted = v.split("||")
+                pre = ""
+                if len(v_or_and_splitted) > 1:
+                    for v_o_a in v_or_and_splitted:
+                        pre += f" {k} LIKE '%{v_o_a}%' OR "
+                pre = pre[0:-4]
+                query += f"({pre}) {and_or} " 
             else:
-                query += f"{k} LIKE '%{v}%' AND "
+                if v == "null":
+                    query += f"{k} is NULL {and_or} "
+                elif v.startswith("!"):
+                    query += f"{k} NOT LIKE '%{v[1:]}%' {and_or} "
+                else:
+                    query += f"{k} LIKE '%{v}%' {and_or} "
         
         query = f"{query[0:-5]} LIMIT {res_json['limit']};"
         print(query)

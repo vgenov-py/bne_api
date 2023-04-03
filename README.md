@@ -54,9 +54,12 @@ GET /geo?limit=10&fields=id,t_024
 ```
 
 * El parámetro <strong>fields</strong> permite seleccionar los campos a mostrar por cada registro.
-* Cada campo adicional debe ser separado por comas.
+* Cada campo adicional deberá ser separado por comas.
 
 Ejemplo de respuesta:
+```js
+GET /geo?t_024=viaf&fields=id,t_024
+```
 ```json
 "success": true,
 "length": 10,
@@ -92,7 +95,7 @@ GET /geo?t_024=Andalucía&lugar_jerarquico=España
 ```
 
 * La búsqueda será <strong>insensible</strong> a las mayúsculas.
-* El valor introducido será buscado dentro del campo diana/objetivo. Si indicamos <strong>esp</strong> en el campo <strong>lugar_jerarquico</strong> entregará todos los registros que cotengan las letras <strong>esp</strong>
+* El valor introducido será buscado dentro del campo diana/objetivo. Si indicamos <strong>esp</strong> en el campo <strong>lugar_jerarquico</strong> entregará todos los registros que contengan las letras <strong>esp</strong>
 
 Ejemplo de respuesta:
 ```js
@@ -101,7 +104,7 @@ GET /geo?lugar_jerarquico=esp
 ```json
 "success": true,
 "length": 1000,
-"time": 0.0123...,
+"time": 0.0123,
 "data": [
     {
     "id":"XX450537",
@@ -109,6 +112,55 @@ GET /geo?lugar_jerarquico=esp
     }
 ]
 ```
+
+* Por defecto todo filtri, será agregado con un operador <strong>AND</strong>, si queremos utilizar el operador <strong>OR</strong> agregar <strong>||</strong> al final del valor 
+
+Ejemplo de respuesta:
+```js
+GET /per?t_100=fernández||&nombre_de_persona=sánchez
+```
+```json
+"success": true,
+"length": 1000,
+"time": 0.0123,
+"data": [
+    {
+    "id":"XX819245",
+    "t_100": "|aSánchez del Águila, José Manuel|d1957-",
+    "nombre_de_persona": "Sánchez del Águila, José Manuel, (1957-)"
+    },
+    {
+        "id":"XX819498",
+        "t_100": "|aFernández Ferrer, María José",
+        "nombre_de_persona":"Fernández Ferrer, María José"
+    }
+]
+```
+Buscar diferentes ocurrencias en un mismo campo
+* Si queremos buscar múltiples ocurrencias en un mismo campo, debemos separar cada uno de ellos con el operador <strong>OR</strong> -> <strong>||</strong>
+
+Ejemplo de respuesta:
+```js
+GET /per?t_100=fernández||sánchez
+```
+```json
+"success": true,
+"length": 1000,
+"time": 0.0123,
+"data": [
+    {
+    "id":"XX819245",
+    "t_100": "|aSánchez del Águila, José Manuel|d1957-",
+    "nombre_de_persona": "Sánchez del Águila, José Manuel, (1957-)"
+    },
+    {
+        "id":"XX819498",
+        "t_100": "|aFernández Ferrer, María José",
+        "nombre_de_persona":"Fernández Ferrer, María José"
+    }
+]
+```
+
 
 * Es posible hacer búsquedas "negativas", para éste cometido agregar <strong>!</strong> al principio del valor.
 Ejemplo de respuesta:
@@ -118,11 +170,28 @@ GET /geo?lugar_jerarquico=!esp
 ```json
 "success": true,
 "length": 1000,
-"time": 0.0123...,
+"time": 0.0123,
 "data": [
     {
     "id":"XX450557",
     "lugar_jerarquico": "Gran Bretaña, Escocia"
+    }
+]
+```
+* Es posible buscar campos sin valor, utilizar <strong>null</strong> o <strong>!null</strong> para buscar campos con valor
+
+Ejemplo de respuesta:
+```js
+GET /geo?lugar_jerarquico=null
+```
+```json
+"success": true,
+"length": 1000,
+"time": 0.0123,
+"data": [
+    {
+    "id":"XX450557",
+    "lugar_jerarquico": null
     }
 ]
 ```

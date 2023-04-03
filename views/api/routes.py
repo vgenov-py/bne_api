@@ -24,7 +24,7 @@ def r_home():
     return render_template("index.html")
 
 @api.route("/<model>")
-def r_test(model):
+def r_query(model):
     test_QMO = QMO(model, request.args)
     return test_QMO.query()
 
@@ -32,5 +32,17 @@ def r_test(model):
 def r_entry_data_2(model):
     test_QMO = QMO(model, f"converter/{model}.json")
     return test_QMO.insert()
+
+@api.route("/test")
+def r_test():
+    test_QMO = QMO("per", request.args)
+    result = {}
+    for t in test_QMO.available_fields:
+        if t.startswith("t_"):
+            a = test_QMO.cur.execute(f"SELECT count(id) as {t} FROM per  WHERE {t} is NULL and t_670 is not NULL;")
+            result[t] = tuple(a)[0][t]
+    print(result)
+    return "test_QMO.available_fields"
+
 
 
