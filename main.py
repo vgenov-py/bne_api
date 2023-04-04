@@ -3,6 +3,9 @@ from db import get_db
 import os
 from views.api.routes import api
 from constants import SECRET_KEY, DB_FILE, DATABASE_URI
+from flask_cors import CORS
+
+
 
 
 def create_app():
@@ -18,6 +21,7 @@ def set_db():
     os.system("sqlite3 instance/bne.db < .schema.sql")
 
 app = create_app()
+CORS(app)
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
