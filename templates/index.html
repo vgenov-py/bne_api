@@ -1,4 +1,172 @@
 {%extends "base.html"%}
 {%block main%}
-<img src="https://raw.githubusercontent.com/vgenov-py/bne_api/develop/draw/request_api.png" alt="">
+<h1 id="bne-api">BNE API</h1>
+<h3 id="para-hacer-uso-del-api-deberá-indicar-el-conjunto-de-datos-a-consultar">Para hacer uso del API deberá indicar el conjunto de datos a consultar</h3>
+<p>URL BASE: <a href="http://139.162.183.85/api">http://139.162.183.85/api</a></p>
+<pre><code>Geográfico: geo,
+Persona: per,
+Monografías modernas: mon
+</code></pre>
+<h2 id="dataset">dataset</h2>
+<pre><code class="language-js">GET /geo
+</code></pre>
+<ul>
+<li>Las respuestas serán emitidas en formato JSON y contarán con las siguientes claves en el caso exitoso:</li>
+</ul>
+<pre><code>success: boolean
+length: integer
+time: float
+data: array 
+</code></pre>
+<ul>
+<li>Caso fallido:</li>
+</ul>
+<pre><code>success: boolean
+message: str
+</code></pre>
+<h3 id="ejemplo-de-respuesta">Ejemplo de respuesta:</h3>
+<pre><code class="language-json">&quot;success&quot;: true,
+&quot;length&quot;: 1000,
+&quot;time&quot;: 0.01,
+&quot;data&quot;: [
+    {
+    &quot;id&quot;:&quot;XX450536&quot;,
+    &quot;lugar_jerarquico&quot;: &quot;España, Cataluña&quot;
+    }
+]
+</code></pre>
+<h2 id="parámetros-opcionales">Parámetros opcionales:</h2>
+<h2 id="limit">limit</h2>
+<pre><code class="language-js">GET /geo?limit=10
+</code></pre>
+<ul>
+<li>El parámetro <strong>limit</strong> permite limitar la cantidad de resultados a mostrar, el valor por defecto es 1000.</li>
+</ul>
+<h2 id="fields">fields</h2>
+<pre><code class="language-js">GET /geo?limit=10&amp;fields=id,t_024
+</code></pre>
+<ul>
+<li>El parámetro <strong>fields</strong> permite seleccionar los campos a mostrar por cada registro.</li>
+<li>Cada campo adicional deberá ser separado por comas.</li>
+</ul>
+<p>Ejemplo de respuesta:</p>
+<pre><code class="language-js">GET /geo?t_024=viaf&amp;fields=id,t_024
+</code></pre>
+<pre><code class="language-json">&quot;success&quot;: true,
+&quot;length&quot;: 10,
+&quot;time&quot;: 0.01,
+&quot;data&quot;: [
+    {
+    &quot;id&quot;:&quot;XX450536&quot;,
+    &quot;t_024&quot;: &quot;|ahttp://id.loc.gov/authorities/names/n79089624|2lcnaf /**/ |ahttp://viaf.org/viaf/316429160|2viaf&quot;
+    }
+]
+</code></pre>
+<p>Si indicamos un campo inexistente en el conjunto se mostrará el siguiente error:</p>
+<pre><code class="language-json">&quot;success&quot;: false,
+&quot;message&quot;: &quot;This field doesn&#39;t exist in the db: 1 - available fields: (&#39;id&#39;, &#39;t_001&#39;, &#39;t_024&#39;...&quot;
+</code></pre>
+<h3 id="campos-filtro">Campos filtro</h3>
+<p>Para filtrar una búsqueda por un determinado valor deberemos indicar como parámetro la columna a buscar y el valor por el cual queramos filtrar.</p>
+<pre><code class="language-js">GET /geo?t_024=Andalucía
+</code></pre>
+<ul>
+<li>Las etiquetas MARC deben ser indicadas con el prefijo <strong>t_</strong></li>
+<li>Cada filtro adicional debe ser agregado como un nuevo parámetro utilizando el caracter <strong>&amp;</strong></li>
+</ul>
+<pre><code class="language-js">GET /geo?t_024=Andalucía&amp;lugar_jerarquico=España
+</code></pre>
+<ul>
+<li>La búsqueda será <strong>insensible</strong> a las mayúsculas.</li>
+<li>El valor introducido será buscado dentro del campo diana/objetivo. Si indicamos <strong>esp</strong> en el campo <strong>lugar_jerarquico</strong> entregará todos los registros que contengan las letras <strong>esp</strong></li>
+</ul>
+<p>Ejemplo de respuesta:</p>
+<pre><code class="language-js">GET /geo?lugar_jerarquico=esp
+</code></pre>
+<pre><code class="language-json">&quot;success&quot;: true,
+&quot;length&quot;: 1000,
+&quot;time&quot;: 0.0123,
+&quot;data&quot;: [
+    {
+    &quot;id&quot;:&quot;XX450537&quot;,
+    &quot;lugar_jerarquico&quot;: &quot;España, Andalucía&quot;
+    }
+]
+</code></pre>
+<p>Por defecto todo filtro, será agregado con un operador <strong>AND</strong>, si queremos utilizar el operador <strong>OR</strong>, agregar <strong>||</strong> al final del valor </p>
+<p>Ejemplo de respuesta:</p>
+<pre><code class="language-js">GET /per?t_100=fernández||&amp;nombre_de_persona=sánchez
+</code></pre>
+<pre><code class="language-json">&quot;success&quot;: true,
+&quot;length&quot;: 1000,
+&quot;time&quot;: 0.0123,
+&quot;data&quot;: [
+    {
+    &quot;id&quot;:&quot;XX819245&quot;,
+    &quot;t_100&quot;: &quot;|aSánchez del Águila, José Manuel|d1957-&quot;,
+    &quot;nombre_de_persona&quot;: &quot;Sánchez del Águila, José Manuel, (1957-)&quot;
+    },
+    {
+        &quot;id&quot;:&quot;XX819498&quot;,
+        &quot;t_100&quot;: &quot;|aFernández Ferrer, María José&quot;,
+        &quot;nombre_de_persona&quot;:&quot;Fernández Ferrer, María José&quot;
+    }
+]
+</code></pre>
+<p>Buscar diferentes ocurrencias en un mismo campo
+Si queremos buscar múltiples ocurrencias en un mismo campo, debemos separar cada uno de ellos con el operador <strong>OR</strong> -&gt; <strong>||</strong></p>
+<p>Ejemplo de respuesta:</p>
+<pre><code class="language-js">GET /per?t_100=fernández||sánchez
+</code></pre>
+<pre><code class="language-json">&quot;success&quot;: true,
+&quot;length&quot;: 1000,
+&quot;time&quot;: 0.0123,
+&quot;data&quot;: [
+    {
+    &quot;id&quot;:&quot;XX819245&quot;,
+    &quot;t_100&quot;: &quot;|aSánchez del Águila, José Manuel|d1957-&quot;,
+    &quot;nombre_de_persona&quot;: &quot;Sánchez del Águila, José Manuel, (1957-)&quot;
+    },
+    {
+        &quot;id&quot;:&quot;XX819498&quot;,
+        &quot;t_100&quot;: &quot;|aFernández Ferrer, María José&quot;,
+        &quot;nombre_de_persona&quot;:&quot;Fernández Ferrer, María José&quot;
+    }
+]
+</code></pre>
+<p>Es posible hacer búsquedas &quot;negativas&quot;, para éste cometido agregar <strong>!</strong> al principio del valor.
+Ejemplo de respuesta:</p>
+<pre><code class="language-js">GET /geo?lugar_jerarquico=!esp
+</code></pre>
+<pre><code class="language-json">&quot;success&quot;: true,
+&quot;length&quot;: 1000,
+&quot;time&quot;: 0.0123,
+&quot;data&quot;: [
+    {
+    &quot;id&quot;:&quot;XX450557&quot;,
+    &quot;lugar_jerarquico&quot;: &quot;Gran Bretaña, Escocia&quot;
+    }
+]
+</code></pre>
+<p>Es posible buscar campos sin valor, utilizar <strong>null</strong> o <strong>!null</strong> para buscar campos con valor</p>
+<p>Ejemplo de respuesta:</p>
+<pre><code class="language-js">GET /geo?lugar_jerarquico=null
+</code></pre>
+<pre><code class="language-json">&quot;success&quot;: true,
+&quot;length&quot;: 1000,
+&quot;time&quot;: 0.0123,
+&quot;data&quot;: [
+    {
+    &quot;id&quot;:&quot;XX450557&quot;,
+    &quot;lugar_jerarquico&quot;: null
+    }
+]
+</code></pre>
+<h1 id="diagramas">Diagramas</h1>
+<p><img src="https://raw.githubusercontent.com/vgenov-py/bne_api/develop/draw/request_api.png" alt="request api"></p>
+<h3 id="modelo-geográfico">Modelo geográfico</h3>
+<p><img src="https://raw.githubusercontent.com/vgenov-py/bne_api/develop/draw/geo_model.png" alt="Modelo geográfico"></p>
+<h3 id="modelo-persona">Modelo persona</h3>
+<p><img src="https://raw.githubusercontent.com/vgenov-py/bne_api/develop/draw/per_model.png" alt="Modelo persona"></p>
+
 {%endblock%}
