@@ -1,12 +1,8 @@
 from flask import Flask, g
-from db import get_db
 import os
 from views.api.routes import api
-from constants import SECRET_KEY, DB_FILE, DATABASE_URI
+from constants import SECRET_KEY, DB_FILE
 from flask_cors import CORS
-
-
-
 
 def create_app():
     app = Flask(__name__)

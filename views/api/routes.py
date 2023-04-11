@@ -1,12 +1,6 @@
 from flask import Blueprint,  request, render_template
 from db import QMO
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
 api = Blueprint("api", __name__)
 '''
 
@@ -41,7 +35,7 @@ def r_test():
         if t.startswith("t_"):
             a = test_QMO.cur.execute(f"SELECT count(id) as {t} FROM per  WHERE {t} is NULL and t_670 is not NULL;")
             result[t] = tuple(a)[0][t]
-    print(result)
+    # print(result)
     return "test_QMO.available_fields"
 
 

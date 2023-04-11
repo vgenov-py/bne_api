@@ -5,6 +5,7 @@ import re
 import json
 import time
 from uuid import uuid4
+
 def dict_factory(cursor, row):
     d = {}
     for idx, col in enumerate(cursor.description):
