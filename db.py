@@ -398,7 +398,12 @@ class QMO:
                 pre = ""
                 if len(v_or_and_splitted) >= 1:
                     for v_o_a in v_or_and_splitted:
-                        pre += f" {k} LIKE '%{v_o_a}%' OR "
+                        print(v_o_a)
+                        if v_o_a.startswith("!"):
+                            pre += f" {k} NOT LIKE '%{v_o_a[1:]}%' OR "
+                        else:
+                            pre += f" {k} LIKE '%{v_o_a}%' OR "
+
                 pre = pre[0:-4]
                 query += f"({pre}) {and_or} " 
             else:
