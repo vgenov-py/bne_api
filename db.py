@@ -424,6 +424,30 @@ class QMO:
         res_json["data"] = res
         return res_json
     
+    def blunt_query(self):
+        start = self.time
+        query: str = self.args.get("query")
+        res_json = self.res_json
+        blacklisted = ("update", "delete", "create", "insert", "pragma", "table_info")
+        if query:
+            q = query.lower()
+            for bl in blacklisted:
+                if q.find(bl) >= 0:
+                    res_json["message"] = "Not a valid query"
+                    return res_json
+        print(query)
+        try:
+            res = list(self.cur.execute(query))
+        except Exception as e:
+            res_json["message"] = "Bad formulated query"
+            res_json["error"] = f"{e}"
+            return res_json
+        res_json["success"] = True
+        res_json["length"] = len(res)
+        res_json["time"] = self.time - start
+        res_json["data"] = res
+        return res_json
+
     def insert(self):
         res_json = {"success":False}
         with open(f"converter/{self.dataset}.json", encoding="utf-8") as file:

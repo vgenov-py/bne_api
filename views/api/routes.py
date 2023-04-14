@@ -27,6 +27,11 @@ def r_entry_data_2(model):
     test_QMO = QMO(model, f"converter/{model}.json")
     return test_QMO.insert()
 
+@api.route("/blunt")
+def r_blunt_query():
+    res = QMO("", request.args)
+    return res.blunt_query()
+
 @api.route("/test")
 def r_test():
     test_QMO = QMO("per", request.args)
