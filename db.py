@@ -310,13 +310,16 @@ class QMO:
         if not value:
             return
         result = ""
-        dollar_c = self.get_single_dollar(value, "c")
-        if dollar_c:
-            result += f", {dollar_c}"
-        dollar_d = self.get_single_dollar(value, "d")
-        if dollar_d:
-            result += f", {dollar_d}"
-        return result
+        value_splitted = value.split(self.splitter)
+        for v_s in value_splitted:
+            try:
+                if self.get_single_dollar(v_s, "c"):
+                    result += self.get_single_dollar(v_s, "c") + self.splitter
+                if self.get_single_dollar(v_s, "d"):
+                    result += self.get_single_dollar(v_s, "d") + self.splitter
+            except Exception:
+                    pass
+        return result[0:-6]
         
     def per_other_sources(self, value:str) -> str:
         if not value:
@@ -331,6 +334,8 @@ class QMO:
             return result
     
     def per_gen_url(self, value: str) -> str:
+        if not value:
+            return None
         result = "http://catalogo.bne.es/uhtbin/cgisirsi/0/x/0/05?searchdata1=%5ea"
         result += value[4:]
         return result   
@@ -404,7 +409,6 @@ class QMO:
                 pre = ""
                 if len(v_or_and_splitted) >= 1:
                     for v_o_a in v_or_and_splitted:
-                        print(v_o_a)
                         if v_o_a.startswith("!"):
                             pre += f" {k} NOT LIKE '%{v_o_a[1:]}%' OR "
                         else:
