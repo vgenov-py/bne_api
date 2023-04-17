@@ -191,6 +191,16 @@ class QMO:
             
         return tuple(result)
     
+    def get_single_dollar(self, value:str, dollar: str) -> str:
+        if not value:
+            return None
+        re_selected_dollar = f"\|{dollar}([ \S]*?)\||\|{dollar}([ \S+]+)"
+        value = re.search(re_selected_dollar, value)
+        if value:
+             for match in value.groups():
+                  if match:
+                       return match
+    
     def dollar_parser(self, value: str) -> str:
         if not value:
             return None
@@ -218,9 +228,11 @@ class QMO:
         for v_s in value_splitted:
             try:
                 _, place = re.split("\|a", v_s, 1)
+                # place = self.get_single_dollar(v_s, "a")
                 result += f"{place}{self.splitter}"
             except Exception:
                 pass
+        return result
     
     def sources(self, value: str) -> str:
         result = ""
@@ -258,6 +270,7 @@ class QMO:
                             n = -n
                         result += f", {n}"
         
+    
             return result
         except:
             return None
@@ -273,15 +286,6 @@ class QMO:
         else:
             return        
 
-    def get_single_dollar(self, value:str, dollar: str) -> str:
-        if not value:
-            return None
-        re_selected_dollar = f"\|{dollar}([ \S]*?)\||\|{dollar}([ \S+]+)"
-        value = re.search(re_selected_dollar, value)
-        if value:
-             for match in value.groups():
-                  if match:
-                       return match
     
     def per_person_name(self, value: str) -> str:
         if not value:
@@ -389,6 +393,8 @@ class QMO:
         fields = res_json['fields'] if res_json['fields'] else '*'
         query = f"SELECT {fields} FROM {self.dataset} WHERE "
         for k,v in res_json["args"].items():
+            if re.search("[á-ú]", v.lower()):
+                v = re.sub("[á-ú]", "_", v.lower())
             is_multiple = True if v.find("||") >= 0 else False
             and_or = "OR " if v[-2:] == "||" else "AND"
             if and_or == "OR ":
@@ -428,7 +434,7 @@ class QMO:
         start = self.time
         query: str = self.args.get("query")
         res_json = self.res_json
-        blacklisted = ("update", "delete", "create", "insert", "pragma", "table_info")
+        blacklisted = ("update", "delete", "create", "insert", "pragma", "table_info", "drop", "alter" , "commit", "into")
         if query:
             q = query.lower()
             for bl in blacklisted:
