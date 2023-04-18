@@ -389,6 +389,41 @@ class QMO:
         res_json["success"] = True
         return res_json
     
+    def where(self, args: dict) -> str:
+        result = "WHERE "
+        and_or = " AND "
+        for k,value in args:
+            value: str = value.lower()
+            if value[-2:] == "||":
+                and_or = " OR  "
+                value = value[0:-2]
+            else:
+                and_or = " AND "
+            if value[0] == "!":
+                value = value.replace("!", "NOT LIKE ", 1)
+            else:
+                value = f"LIKE {value}"
+            
+            value = value.replace("||", f" OR {k} LIKE ")
+            value = value.replace("¬", f" AND {k} LIKE ")
+            value = value.replace("LIKE !", "NOT LIKE ")
+            value_splitted = value.split(" ")
+            for i,v in enumerate(value_splitted):
+                if v.islower() and v not in self.available_fields:
+                    if v == "null":
+                        value = value.replace(v, "NULL")
+                        if value.find("NOT LIKE NULL") >= 0:
+                            value = value.replace("NOT LIKE NULL", "IS NOT NULL")
+                        elif value.find("LIKE NULL") >= 0:
+                            value = value.replace("LIKE NULL", "IS NULL")
+                    else:
+                        value = value.replace(v, f"'%{v}%'")
+
+                    
+            result += f"{k} {value}{and_or}"
+        # print(result)
+        return result[0:-5]
+    
     def query(self):
         start = self.time
         res_json = self.purgue
@@ -396,35 +431,37 @@ class QMO:
             return {"success":False,"message":res_json["message"]}
         
         fields = res_json['fields'] if res_json['fields'] else '*'
-        query = f"SELECT {fields} FROM {self.dataset} WHERE "
-        for k,v in res_json["args"].items():
-            if re.search("[á-ú]", v.lower()):
-                v = re.sub("[á-ú]", "_", v.lower())
-            is_multiple = True if v.find("||") >= 0 else False
-            and_or = "OR " if v[-2:] == "||" else "AND"
-            if and_or == "OR ":
-                v = v[0:-2]
-            if is_multiple:
-                v_or_and_splitted = v.split("||")
-                pre = ""
-                if len(v_or_and_splitted) >= 1:
-                    for v_o_a in v_or_and_splitted:
-                        if v_o_a.startswith("!"):
-                            pre += f" {k} NOT LIKE '%{v_o_a[1:]}%' OR "
-                        else:
-                            pre += f" {k} LIKE '%{v_o_a}%' OR "
+        query = f"SELECT {fields} FROM {self.dataset} "
+        query += self.where(res_json["args"].items())
+        # query = f"SELECT {fields} FROM {self.dataset} WHERE "
+        # for k,v in res_json["args"].items():
+        #     if re.search("[á-ú]", v.lower()):
+        #         v = re.sub("[á-ú]", "_", v.lower())
+        #     is_multiple = True if v.find("||") >= 0 else False
+        #     and_or = "OR " if v[-2:] == "||" else "AND"
+        #     if and_or == "OR ":
+        #         v = v[0:-2]
+        #     if is_multiple:
+        #         v_or_and_splitted = v.split("||")
+        #         pre = ""
+        #         if len(v_or_and_splitted) >= 1:
+        #             for v_o_a in v_or_and_splitted:
+        #                 if v_o_a.startswith("!"):
+        #                     pre += f" {k} NOT LIKE '%{v_o_a[1:]}%' OR "
+        #                 else:
+        #                     pre += f" {k} LIKE '%{v_o_a}%' OR "
 
-                pre = pre[0:-4]
-                query += f"({pre}) {and_or} " 
-            else:
-                if v == "null":
-                    query += f"{k} is NULL {and_or} "
-                elif v.startswith("!"):
-                    query += f"{k} NOT LIKE '%{v[1:]}%' {and_or} "
-                else:
-                    query += f"{k} LIKE '%{v}%' {and_or} "
-        
-        query = f"{query[0:-5]} LIMIT {res_json['limit']};"
+        #         pre = pre[0:-4]
+        #         query += f"({pre}) {and_or} " 
+        #     else:
+        #         if v == "null":
+        #             query += f"{k} is NULL {and_or} "
+        #         elif v.startswith("!"):
+        #             query += f"{k} NOT LIKE '%{v[1:]}%' {and_or} "
+        #         else:
+        #             query += f"{k} LIKE '%{v}%' {and_or} "
+        query += f" LIMIT {res_json['limit']};"
+        # query = f"{query[0:-5]} LIMIT {res_json['limit']};"
         print(query)
         res = list(self.cur.execute(query))
         res_json = self.res_json
