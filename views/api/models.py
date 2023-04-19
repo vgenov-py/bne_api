@@ -78,6 +78,7 @@ query_create_mon = f'''
     CREATE TABLE mon (
     id TEXT PRIMARY KEY,
     t_001 TEXT,
+    t_008 TEXT,
     t_035 TEXT,
     t_040 TEXT,
     t_100 TEXT,

@@ -176,6 +176,7 @@ class QMO:
         elif dataset == "mon":
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
             result.append(record.get("001"))
+            result.append(record.get("008"))
             result.append(record.get("035"))
             result.append(record.get("040"))
             result.append(record.get("100"))
@@ -324,14 +325,19 @@ class QMO:
     def per_other_sources(self, value:str) -> str:
         if not value:
             return
-        dollar_a = self.get_single_dollar(value, "a")
-        dollar_b = self.get_single_dollar(value, "b")
-        dollar_u = self.get_single_dollar(value, "u")
-        if dollar_a and dollar_b:
-            result = f"{dollar_a}: {dollar_b}"
-            if dollar_u:
-                result += f" ({dollar_u})"
-            return result
+        result = ""
+        for v_s in value.split(self.splitter):
+            dollar_a = self.get_single_dollar(v_s, "a")
+            dollar_b = self.get_single_dollar(v_s, "b")
+            dollar_u = self.get_single_dollar(v_s, "u")
+            if dollar_a and dollar_b:
+                if result:
+                    result += f", {dollar_a}: {dollar_b}"
+                else:
+                    result = f"{dollar_a}: {dollar_b}"
+                if dollar_u:
+                    result += f" ({dollar_u})"
+        return result
     
     def per_gen_url(self, value: str) -> str:
         if not value:
@@ -353,6 +359,17 @@ class QMO:
         if t_510:
             t_510 = self.dollar_parser(t_510)
             result += f"{self.splitter}{t_510}"
+        return result
+
+    def get_all_by_single_dollar(self, value: str, dollar:str) -> str:
+        if not value:
+            return
+        result = ""
+        for v_s in value.split(self.splitter):
+            try:
+                self.get_single_dollar(v_s, dollar)
+            except:
+                pass
         return result
 
     @property
@@ -409,7 +426,7 @@ class QMO:
             value = value.replace("LIKE !", "NOT LIKE ")
             value_splitted = value.split(" ")
             for i,v in enumerate(value_splitted):
-                if v.islower() and v not in self.available_fields:
+                if v.islower() and v not in self.available_fields or not v.isalnum():
                     if v == "null":
                         value = value.replace(v, "NULL")
                         if value.find("NOT LIKE NULL") >= 0:

@@ -1,6 +1,7 @@
 from flask import Flask, g, render_template
 import os
 from views.api.routes import api
+from views.home.routes import web
 from constants import SECRET_KEY, DB_FILE
 from flask_cors import CORS
 
@@ -10,6 +11,7 @@ def create_app():
     app.config["TIMEZONE"] = "Europe/Madrid"
     app.config['JSON_SORT_KEYS'] = False
     app.register_blueprint(api, url_prefix="/api")
+    app.register_blueprint(web)
     return app
 
 def set_db():
@@ -19,9 +21,6 @@ def set_db():
 app = create_app()
 CORS(app)
 
-@app.route("/")
-def r_home():
-    return render_template("index.html")
 
 @app.teardown_appcontext
 def close_connection(exception):
