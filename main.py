@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask, g, render_template
 import os
 from views.api.routes import api
 from constants import SECRET_KEY, DB_FILE
@@ -18,6 +18,11 @@ def set_db():
 
 app = create_app()
 CORS(app)
+
+@app.route("/")
+def r_home():
+    return render_template("index.html")
+
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)

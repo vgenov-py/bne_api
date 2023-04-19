@@ -113,8 +113,8 @@ message: str
     }
 ]
 </code></pre>
-<p>Buscar diferentes ocurrencias en un mismo campo
-Si queremos buscar múltiples ocurrencias en un mismo campo, debemos separar cada uno de ellos con el operador <strong>OR</strong> -&gt; <strong>||</strong></p>
+<p>Buscar diferentes ocurrencias en un mismo campo</p>
+<p>Si queremos buscar múltiples ocurrencias en un mismo campo, debemos separar cada uno de ellos con el operador <strong>OR</strong> -&gt; <strong>||</strong> o si queremos utilizar el operador <strong>AND</strong> -&gt; <strong>¬</strong></p>
 <p>Ejemplo de respuesta:</p>
 <pre><code class="language-js">GET /per?t_100=fernández||sánchez
 </code></pre>
@@ -134,9 +134,9 @@ Si queremos buscar múltiples ocurrencias en un mismo campo, debemos separar cad
     }
 ]
 </code></pre>
-<p>Es posible hacer búsquedas &quot;negativas&quot;, para éste cometido agregar <strong>!</strong> al principio del valor.
-Ejemplo de respuesta:</p>
-<pre><code class="language-js">GET /geo?lugar_jerarquico=!esp
+<p>Es posible hacer búsquedas &quot;negativas&quot;, para éste cometido agregar <strong>!</strong> al principio del valor.</p>
+<p>Ejemplo de respuesta:</p>
+<pre><code class="language-js">GET /geo?lugar_jerarquico=!esp¬!argentina
 </code></pre>
 <pre><code class="language-json">&quot;success&quot;: true,
 &quot;length&quot;: 1000,

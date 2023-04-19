@@ -68,6 +68,9 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.per_gen_url("|aXX133007"), "http://catalogo.bne.es/uhtbin/cgisirsi/0/x/0/05?searchdata1=%5ea133007")
         self.assertEqual(self.per.per_gen_url(None), None)
 
+    def test_(self):
+        self.assertEqual(self.per.group_or_entity({}), None)
+        self.assertEqual(self.per.group_or_entity({"373":"|aAteneo de Madrid|2abne","510":"|aEspaña|bPresidente (1936-1939: Azaña) /**/ |wr|iEntidad corporativa fundada:|aIzquierda Republicana (España. 1934-1959) /**/ |wr|iEntidad corporativa fundada:|aAcción Republicana"}), "Ateneo de Madrid /**/ España, Presidente (1936-1939: Azaña) /**/ , r, Entidad corporativa fundada:, Izquierda Republicana (España. 1934-1959) /**/ , r, Entidad corporativa fundada:, Acción Republicana")
 
 if __name__ == '__main__':
     qmo_funcs = tuple(filter(lambda func: not func.startswith("__"),dir(qmo_funcs)))

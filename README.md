@@ -137,7 +137,8 @@ GET /per?t_100=fernández||&nombre_de_persona=sánchez
 ]
 ```
 Buscar diferentes ocurrencias en un mismo campo
-Si queremos buscar múltiples ocurrencias en un mismo campo, debemos separar cada uno de ellos con el operador <strong>OR</strong> -> <strong>||</strong>
+
+Si queremos buscar múltiples ocurrencias en un mismo campo, debemos separar cada uno de ellos con el operador <strong>OR</strong> -> <strong>||</strong> o si queremos utilizar el operador <strong>AND</strong> -> <strong>¬</strong>
 
 Ejemplo de respuesta:
 ```js
@@ -161,11 +162,11 @@ GET /per?t_100=fernández||sánchez
 ]
 ```
 
-
 Es posible hacer búsquedas "negativas", para éste cometido agregar <strong>!</strong> al principio del valor.
+
 Ejemplo de respuesta:
 ```js
-GET /geo?lugar_jerarquico=!esp
+GET /geo?lugar_jerarquico=!esp¬!argentina
 ```
 ```json
 "success": true,
