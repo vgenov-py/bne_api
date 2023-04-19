@@ -13,9 +13,9 @@ mysql -u root -p xray < back.sql
 '''
 
 
-# @api.route("/")
-# def r_home():
-#     return render_template("index.html")
+@api.route("/")
+def r_home():
+    return render_template("index.html")
 
 @api.route("/<model>")
 def r_query(model):
