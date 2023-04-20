@@ -15,6 +15,8 @@ mysql -u root -p xray < back.sql
 
 @api.route("/")
 def r_home():
+    test = QMO("per")
+    test.con.execute("select regex_version();")
     return render_template("index.html")
 
 @api.route("/<model>")

@@ -177,6 +177,7 @@ class QMO:
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
             result.append(record.get("001"))
             result.append(record.get("008"))
+            result.append(record.get("020"))
             result.append(record.get("035"))
             result.append(record.get("040"))
             result.append(record.get("100"))
@@ -185,6 +186,7 @@ class QMO:
             result.append(record.get("260"))
             result.append(record.get("300"))
             result.append(record.get("500"))
+            result.append(record.get("700"))
             result.append(record.get("899"))
             result.append(record.get("927"))
             result.append(record.get("980"))
@@ -434,9 +436,19 @@ class QMO:
                         elif value.find("LIKE NULL") >= 0:
                             value = value.replace("LIKE NULL", "IS NULL")
                     else:
+                        # contains_accent = re.findall("[á,é,í,ó,ú]", v)
+                        # if len(contains_accent) >= 1:
+                        #     v = v.replace(contains_accent[0])
+                        # print(a)
+                        # a = re.match("[á,é,í,ó,ú]", v)
+                        # print(a)
                         value = value.replace(v, f"'%{v}%'")
 
-                    
+            d = f'''
+            replace(replace(replace(replace(replace(replace(replace(replace(
+            replace(replace(replace( lower({k}), 'á','a'), 'ã','a'), 'â','a'), 'é','e'), 'ê','e'), 'í','i'),
+            'ó','o') ,'õ','o') ,'ô','o'),'ú','u'), 'ç','c')
+            '''
             result += f"{k} {value}{and_or}"
         # print(result)
         return result[0:-5]
@@ -450,36 +462,8 @@ class QMO:
         fields = res_json['fields'] if res_json['fields'] else '*'
         query = f"SELECT {fields} FROM {self.dataset} "
         query += self.where(res_json["args"].items())
-        # query = f"SELECT {fields} FROM {self.dataset} WHERE "
-        # for k,v in res_json["args"].items():
-        #     if re.search("[á-ú]", v.lower()):
-        #         v = re.sub("[á-ú]", "_", v.lower())
-        #     is_multiple = True if v.find("||") >= 0 else False
-        #     and_or = "OR " if v[-2:] == "||" else "AND"
-        #     if and_or == "OR ":
-        #         v = v[0:-2]
-        #     if is_multiple:
-        #         v_or_and_splitted = v.split("||")
-        #         pre = ""
-        #         if len(v_or_and_splitted) >= 1:
-        #             for v_o_a in v_or_and_splitted:
-        #                 if v_o_a.startswith("!"):
-        #                     pre += f" {k} NOT LIKE '%{v_o_a[1:]}%' OR "
-        #                 else:
-        #                     pre += f" {k} LIKE '%{v_o_a}%' OR "
-
-        #         pre = pre[0:-4]
-        #         query += f"({pre}) {and_or} " 
-        #     else:
-        #         if v == "null":
-        #             query += f"{k} is NULL {and_or} "
-        #         elif v.startswith("!"):
-        #             query += f"{k} NOT LIKE '%{v[1:]}%' {and_or} "
-        #         else:
-        #             query += f"{k} LIKE '%{v}%' {and_or} "
         query += f" LIMIT {res_json['limit']};"
-        # query = f"{query[0:-5]} LIMIT {res_json['limit']};"
-        print(query)
+        print(f"\n{query}\n".center(50 + len(query),"#"))
         res = list(self.cur.execute(query))
         res_json = self.res_json
         res_json["success"] = True
