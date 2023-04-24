@@ -92,6 +92,7 @@ query_create_mon = f'''
     t_899 TEXT,
     t_927 TEXT,
     t_980 TEXT,
-    t_994 TEXT
+    t_994 TEXT,
+    per_id TEXT
     );
 '''

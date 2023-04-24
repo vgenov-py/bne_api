@@ -4,7 +4,6 @@ from views.api.routes import api
 from views.home.routes import web
 from constants import SECRET_KEY, DB_FILE
 from flask_cors import CORS
-import sqlite_regex
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = SECRET_KEY

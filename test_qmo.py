@@ -24,6 +24,14 @@ class test_QMO(unittest.TestCase):
          pass
 
     '''
+    WHERE:
+    '''
+
+    # def test_where(self):
+    #     args = {"id":"XX100900"}
+    #     self.assertEqual(self.per.where(args), '''WHERE id LIKE "%XX100900%"''')
+
+    '''
     GEO:
     '''
 
@@ -71,6 +79,16 @@ class test_QMO(unittest.TestCase):
     def test_(self):
         self.assertEqual(self.per.group_or_entity({}), None)
         self.assertEqual(self.per.group_or_entity({"373":"|aAteneo de Madrid|2abne","510":"|aEspaña|bPresidente (1936-1939: Azaña) /**/ |wr|iEntidad corporativa fundada:|aIzquierda Republicana (España. 1934-1959) /**/ |wr|iEntidad corporativa fundada:|aAcción Republicana"}), "Ateneo de Madrid /**/ España, Presidente (1936-1939: Azaña) /**/ , r, Entidad corporativa fundada:, Izquierda Republicana (España. 1934-1959) /**/ , r, Entidad corporativa fundada:, Acción Republicana")
+    
+    '''
+    MON:
+    '''
+
+    def test_get_single_dollar(self):
+        self.assertEqual(self.per.mon_per_id("|aRipoll y Vilamajó, Jaime|0XX919455"), "XX919455")
+        self.assertEqual(self.per.mon_per_id("|aAntón, Francisco|qAntón Alted"), None)
+        self.assertEqual(self.per.mon_per_id(None), None)
+        self.assertEqual(self.per.mon_per_id(""), None)
 
 if __name__ == '__main__':
     qmo_funcs = tuple(filter(lambda func: not func.startswith("__"),dir(qmo_funcs)))

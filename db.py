@@ -191,6 +191,7 @@ class QMO:
             result.append(record.get("927"))
             result.append(record.get("980"))
             result.append(record.get("994"))
+            result.append(self.mon_per_id(record.get("100")))
             
         return tuple(result)
     
@@ -374,6 +375,17 @@ class QMO:
                 pass
         return result
 
+    '''
+    GEO:
+    '''
+
+    def mon_per_id(self, value:str) -> str:
+        if not value:
+            return
+        result = self.get_single_dollar(value, "0")
+        if result:
+            return result
+        
     @property
     def purgue(self):
         res_json = self.res_json
