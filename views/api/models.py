@@ -31,7 +31,7 @@ query_create_geo = f'''
 
 query_create_per_human = f'''
     CREATE TABLE per (
-    id TEXT PRIMRAY KEY,
+    id TEXT PRIMARY KEY,
     t_001 TEXT,
     t_024 TEXT,
     t_046 TEXT,

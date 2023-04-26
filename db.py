@@ -43,6 +43,11 @@ class QMO:
         return res
     
     @property
+    def virtual_fields(self) -> tuple:
+        res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset}_fts);")))
+        return res
+    
+    @property
     def marc_fields(self) -> tuple:
         result = ""
         res = filter(lambda column: column["name"].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
@@ -376,7 +381,7 @@ class QMO:
         return result
 
     '''
-    GEO:
+    MON:
     '''
 
     def mon_per_id(self, value:str) -> str:
@@ -405,7 +410,11 @@ class QMO:
             if field not in self.available_fields:
                 res_json["message"] = f"This field doesn't exist in the db: {field} - available fields: {self.available_fields}"
                 return res_json
-        res_json["fields"] = fields
+            field:str = f"{self.dataset}.{field.strip()}"
+        if fields:
+            res_json["fields"] = f'''{self.dataset}.{fields.replace(",",f",{self.dataset}.")}'''
+        else:
+            res_json["fields"] = fields
         
         not_available_field = next(filter(lambda kv: kv[0] not in self.available_fields, args.items()), None)
         if not_available_field:
@@ -424,47 +433,50 @@ class QMO:
         result = "WHERE "
         and_or = " AND "
         for k,value in args:
-            value: str = value.lower()
-            if value[-2:] == "||":
-                and_or = " OR  "
-                value = value[0:-2]
-            else:
-                and_or = " AND "
-            if value[0] == "!":
-                value = value.replace("!", "NOT LIKE ", 1)
-            else:
-                value = f"LIKE {value}"
-            
-            value = value.replace("||", f" OR {k} LIKE ")
-            value = value.replace("¬", f" AND {k} LIKE ")
-            value = value.replace("LIKE !", "NOT LIKE ")
-            value_splitted = value.split(" ")
-            for i,v in enumerate(value_splitted):
-                if v.islower() and v not in self.available_fields or not v.isalnum():
-                    if v == "null":
-                        value = value.replace(v, "NULL")
-                        if value.find("NOT LIKE NULL") >= 0:
-                            value = value.replace("NOT LIKE NULL", "IS NOT NULL")
-                        elif value.find("LIKE NULL") >= 0:
-                            value = value.replace("LIKE NULL", "IS NULL")
-                    else:
-                        # contains_accent = re.findall("[á,é,í,ó,ú]", v)
-                        # if len(contains_accent) >= 1:
-                        #     v = v.replace(contains_accent[0])
-                        # print(a)
-                        # a = re.match("[á,é,í,ó,ú]", v)
-                        # print(a)
-                        value = value.replace(v, f"'%{v}%'")
 
-            d = f'''
-            replace(replace(replace(replace(replace(replace(replace(replace(
-            replace(replace(replace( lower({k}), 'á','a'), 'ã','a'), 'â','a'), 'é','e'), 'ê','e'), 'í','i'),
-            'ó','o') ,'õ','o') ,'ô','o'),'ú','u'), 'ç','c')
             '''
-            result += f"{k} {value}{and_or}"
-        # print(result)
+            VIRTUAL START
+            '''
+            if k in self.virtual_fields:
+                print(k.center(100,"#"))
+                v = re.sub("\|\||¬|!", "", value)
+                v_where = f''' {self.dataset}_fts match '{k}:NEAR("{v}")'  {and_or}'''
+                result += v_where
+            else:
+                value: str = value.lower()
+                if value[-2:] == "||":
+                    and_or = " OR  "
+                    value = value[0:-2]
+                else:
+                    and_or = " AND "
+                if value[0] == "!":
+                    value = value.replace("!", "NOT LIKE ", 1)
+                else:
+                    value = f"LIKE {value}"
+                
+                value = value.replace("||", f" OR {k} LIKE ")
+                value = value.replace("¬", f" AND {k} LIKE ")
+                value = value.replace("LIKE !", "NOT LIKE ")
+                value_splitted = value.split(" ")
+                for v in value_splitted:
+                    if v.islower() and v not in self.available_fields or not v.isalnum():
+                        if v == "null":
+                            value = value.replace(v, "NULL")
+                            if value.find("NOT LIKE NULL") >= 0:
+                                value = value.replace("NOT LIKE NULL", "IS NOT NULL")
+                            elif value.find("LIKE NULL") >= 0:
+                                value = value.replace("LIKE NULL", "IS NULL")
+                        else:
+                            value = value.replace(v, f"'%{v}%'")
+                result += f"{k} {value}{and_or}"
         return result[0:-5]
     
+    def fts_add(self,args:list) -> str:
+        result = ""
+        for k in args:
+            if k in self.virtual_fields:
+                result = f''' INNER JOIN {self.dataset}_fts ON {self.dataset}_fts.id = {self.dataset}.id '''
+        return result
     def query(self):
         start = self.time
         res_json = self.purgue
@@ -473,6 +485,7 @@ class QMO:
         
         fields = res_json['fields'] if res_json['fields'] else '*'
         query = f"SELECT {fields} FROM {self.dataset} "
+        query += self.fts_add(res_json["args"].keys())
         query += self.where(res_json["args"].items())
         query += f" LIMIT {res_json['limit']};"
         print(f"\n{query}\n".center(50 + len(query),"#"))
