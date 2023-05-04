@@ -1,7 +1,8 @@
-from flask import Blueprint,  request, render_template
+from flask import Blueprint,  request, render_template, make_response, Response
 from db import QMO
 import sqlite3
 import time
+import ujson as json
 api = Blueprint("api", __name__)
 '''
 
@@ -19,10 +20,21 @@ def r_home():
     test = QMO("per")
     return render_template("index.html")
 
+# @api.route("/<model>")
+# def r_query(model):
+#     test_QMO = QMO(model, request.args)
+#     return test_QMO.query()
+
 @api.route("/<model>")
 def r_query(model):
+    s = time.perf_counter()
     test_QMO = QMO(model, request.args)
-    return test_QMO.query()
+    data = test_QMO.query()
+    data = json.dumps(data, ensure_ascii=False).encode("utf-8")
+    res = Response(response=data, mimetype="application/json", status=200)
+    e = time.perf_counter()
+    print("TIME ",e-s, " TIME")
+    return res
 
 @api.route("/entry/<model>")
 def r_entry_data_2(model):
@@ -53,12 +65,21 @@ def r_test():
         for idx, col in enumerate(cursor.description):
             d[col[0]] = row[idx]
         return d
-    con = sqlite3.connect("instance/bne.db")
-    con = sqlite3.connect(":memory:")
+    con = sqlite3.connect("instance/bne.db", isolation_level=None)
     con.row_factory = dict_factory
-    cur = con.cursor()
-    res = cur.execute("SELECT id FROM per where t_375 like '%masculino%' LIMIT 100")
-    return {"time":time.perf_counter()-start, "data": list(res)}
+    # cur = con.cursor()
+    con.execute("PRAGMA journal_mode=wal")
+    data = list(con.execute("SELECT * FROM per where t_375 like '%masculino%'"))
+    delta = time.perf_counter()-start
+    res = {
+        "time":delta,
+        "data":data
+    }
+    res = make_response(json.dumps(data).encode("utf8"))
+    res.headers["mime-type"] = "application/json"
+    print(delta)
+    print(time.perf_counter() - start )
+    return res
 
 
 

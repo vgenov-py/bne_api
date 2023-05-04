@@ -477,7 +477,7 @@ class QMO:
             if k in self.virtual_fields:
                 result = f''' INNER JOIN {self.dataset}_fts ON {self.dataset}_fts.id = {self.dataset}.id '''
         return result
-    def query(self):
+    def query(self) -> dict:
         start = self.time
         res_json = self.purgue
         if not res_json["success"]:

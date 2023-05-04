@@ -85,3 +85,30 @@ CREATE TABLE IF NOT EXISTS 'mon_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
 CREATE TABLE IF NOT EXISTS 'mon_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE INDEX mon_per_id on mon(id,per_id);
 CREATE INDEX per_375 on per(id,t_375);
+CREATE TABLE geo (
+        id TEXT PRIMARY KEY,
+        t_001 TEXT,
+        t_024 TEXT,
+        t_034 TEXT,
+        t_080 TEXT,
+        t_151 TEXT,
+        t_451 TEXT,
+        t_510 TEXT,
+        t_550 TEXT,
+        t_551 TEXT,
+        t_667 TEXT,
+        t_670 TEXT,
+        t_781 TEXT,
+        otros_identificadores TEXT,
+        coordenadas_lat_lng TEXT,
+        CDU TEXT,
+        nombre_de_lugar TEXT,
+        otros_nombres_de_lugar TEXT,
+        entidad_relacionada TEXT,
+        materia_relacionada TEXT,
+        lugar_relacionado TEXT,
+        nota_general TEXT,
+        fuentes_de_informacion TEXT,
+        lugar_jerarquico TEXT,
+        obras_relacionadas_en_el_catalogo_BNE TEXT
+    );
