@@ -89,7 +89,7 @@ class QMO:
             result.append(record.get("670"))
             result.append(record.get("781"))
             humans = []
-            humans.append(self.dollar_parser(record.get("001"))  if record.get("001") else None)
+            # humans.append(self.dollar_parser(record.get("001"))  if record.get("001") else None)
             humans.append(self.other_identifiers(record.get("024")))
             humans.append(self.f_lat_lng(record.get("034")) if self.f_lat_lng(record.get("034")) else None)
             #CDU:
@@ -130,11 +130,11 @@ class QMO:
             result.append(record.get("400"))
             result.append(record.get("500"))
             result.append(record.get("510"))
-            result.append(record.get("667"))
+            # result.append(record.get("667"))
             result.append(record.get("670"))
-            result.append(record.get("678"))
+            # result.append(record.get("678"))
             #HUMANS:
-            result.append(self.get_single_dollar(record.get("001"),"a"))
+            # result.append(self.get_single_dollar(record.get("001"),"a"))
             # otros_identificadores
             result.append(self.other_identifiers(record.get("024")))
             # fecha de nacimiento
@@ -170,11 +170,11 @@ class QMO:
             #persona relacionada
             result.append(self.per_person_name(record.get("500")))
             #nota general
-            result.append(self.dollar_parser(record.get("667")))
+            # result.append(self.dollar_parser(record.get("667")))
             #fuentes de información
             result.append(self.per_other_sources(record.get("670")))
             #otros datos biográficos
-            result.append(self.dollar_parser(record.get("678")))
+            # result.append(self.dollar_parser(record.get("678")))
             #obras relacionadas en el catálogo BNE
             result.append(self.per_gen_url(record.get("001")))
 
@@ -528,6 +528,7 @@ class QMO:
                 data = json.load(file)
                 query = f"insert or ignore into {self.dataset} values ({'?, '*len(self.available_fields)})"
                 query = query.replace(", )", ")")
+                print(query.center(50 + len(query), "#"))
                 self.cur.executemany(query,map(lambda record: self.extract_values(self.dataset, record), data))
                 self.con.commit()
                 res_json["success"] = True

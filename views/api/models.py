@@ -13,7 +13,6 @@ query_create_geo = f'''
         t_667 TEXT,
         t_670 TEXT,
         t_781 TEXT,
-        id_BNE TEXT,
         otros_identificadores TEXT,
         coordenadas_lat_lng TEXT,
         CDU TEXT,
@@ -46,10 +45,7 @@ query_create_per_human = f'''
     t_400 TEXT,
     t_500 TEXT,
     t_510 TEXT,
-    t_667 TEXT,
     t_670 TEXT,
-    t_678 TEXT,
-    id_BNE TEXT,
     otros_identificadores TEXT,
     fecha_nacimiento TEXT,
     fecha_muerte TEXT,
@@ -67,11 +63,25 @@ query_create_per_human = f'''
     lengua TEXT,
     otros_nombres TEXT,
     persona_relacionada TEXT,
-    nota_general TEXT,
     fuentes_de_informacion TEXT,
-    otros_datos_biograficos TEXT,
     obras_relacionadas_en_el_catalogo_BNE TEXT
     );
+'''
+
+per_fts = '''
+    CREATE VIRTUAL TABLE per_fts USING FTS5(
+        id,
+        t_100,
+        t_372,
+        t_374,
+        t_400,
+        nombre_de_persona,
+        campo_actividad,
+        ocupacion,
+        otros_nombres,
+        tokenize="unicode61 separators '|a'");
+
+insert into per_fts (id,t_100,t_372,t_374,t_400,nombre_de_persona,campo_actividad,ocupacion,otros_nombres) select id,t_100,t_372,t_374,t_400,nombre_de_persona,campo_actividad,ocupacion,otros_nombres from per;
 '''
 
 query_create_mon = f'''
@@ -95,4 +105,14 @@ query_create_mon = f'''
     t_994 TEXT,
     per_id TEXT
     );
+'''
+
+mon_fts = '''
+    CREATE VIRTUAL TABLE mon_fts USING FTS5(
+        id,
+        t_100,
+        t_245,
+        tokenize="unicode61 separators '|a'");
+        
+    insert into mon_fts (id,t_100,t_245) select id,t_100,t_245 from mon;
 '''

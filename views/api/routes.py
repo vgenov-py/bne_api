@@ -1,6 +1,7 @@
 from flask import Blueprint,  request, render_template
 from db import QMO
-
+import sqlite3
+import time
 api = Blueprint("api", __name__)
 '''
 
@@ -34,16 +35,31 @@ def r_blunt_query():
     res = QMO("", request.args)
     return res.blunt_query()
 
+# @api.route("/test")
+# def r_test():
+#     test_QMO = QMO("per", request.args)
+#     result = {}
+#     for t in test_QMO.available_fields:
+#         if t.startswith("t_"):
+#             a = test_QMO.cur.execute(f"SELECT count(id) as {t} FROM per  WHERE {t} is NULL and t_670 is not NULL;")
+#             result[t] = tuple(a)[0][t]
+#     # print(result)
+#     return "test_QMO.available_fields"
+
 @api.route("/test")
 def r_test():
-    test_QMO = QMO("per", request.args)
-    result = {}
-    for t in test_QMO.available_fields:
-        if t.startswith("t_"):
-            a = test_QMO.cur.execute(f"SELECT count(id) as {t} FROM per  WHERE {t} is NULL and t_670 is not NULL;")
-            result[t] = tuple(a)[0][t]
-    # print(result)
-    return "test_QMO.available_fields"
+    start = time.perf_counter()
+    def dict_factory(cursor, row):
+        d = {}
+        for idx, col in enumerate(cursor.description):
+            d[col[0]] = row[idx]
+        return d
+    con = sqlite3.connect("instance/bne.db")
+    con = sqlite3.connect(":memory:")
+    con.row_factory = dict_factory
+    cur = con.cursor()
+    res = cur.execute("SELECT id FROM per where t_375 like '%masculino%' LIMIT 100")
+    return {"time":time.perf_counter()-start, "data": list(res)}
 
 
 
