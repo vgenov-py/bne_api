@@ -3,8 +3,9 @@ from db import QMO
 import sqlite3
 import time
 import orjson as json
-import cProfile
-import pstats
+# import cProfile
+# import pstats
+# import msgspec
 api = Blueprint("api", __name__)
 '''
 
@@ -15,7 +16,6 @@ mysqldump -u vgenovpy -h vgenovpy.mysql.eu.pythonanywhere-services.com --set-gti
 mysql -u vgenovpy -h vgenovpy.mysql.eu.pythonanywhere-services.com 'vgenovpy$xray'  < back.sql
 mysql -u root -p xray < back.sql
 '''
-
 
 @api.route("/")
 def r_home():
@@ -31,20 +31,26 @@ def r_home():
 def r_query(model):
     s = time.perf_counter()
     test_QMO = QMO(model, request.args)
-    with cProfile.Profile() as pr: # http://localhost:3000/api/per?t_375=masculino&limit=1000000
-        data = test_QMO.query()
-        # e = time.perf_counter()
-        # print("DB ",e-s, " DB")
-        # s = time.perf_counter()
-        # data = json.dumps(data)
-        data["data"] = tuple(map(lambda row:dict(zip(data["av"],row)),data["data"]))
-        data = json.dumps(data)
-        res = Response(response=data, mimetype="application/json", status=200)
-        # e = time.perf_counter()
-        # print("JSON ",e-s, " JSON")
-    stats = pstats.Stats(pr)
-    stats.sort_stats(pstats.SortKey.TIME)
-    stats.print_stats()
+    # with cProfile.Profile() as pr: # http://localhost:3000/api/per?t_375=masculino&limit=1000000
+    data = test_QMO.query()
+
+    if data["success"]:
+        data["time"] = time.perf_counter() - s
+        data["data"] = tuple(data["data"])
+        data["length"] = len(data["data"])
+    data = json.dumps(data)
+    res = Response(response=data, mimetype="application/json", status=200)
+
+        # return Response(
+        #     response=json.dumps(
+        #     {
+        #     "data": tuple(data["data"])
+        #     }
+        #     ), mimetype="application/json", status=200
+        # )
+    # stats = pstats.Stats(pr)
+    # stats.sort_stats(pstats.SortKey.TIME)
+    # stats.print_stats()
     return res
 
 @api.route("/entry/<model>")

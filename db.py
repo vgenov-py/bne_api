@@ -471,7 +471,11 @@ class QMO:
                             elif value.find("LIKE NULL") >= 0:
                                 value = value.replace("LIKE NULL", "IS NULL")
                         else:
-                            value = value.replace(v, f"'%{v}%'")
+                            if k.startswith("t_"):
+                                value = value.replace(v, f"'|%{v}%'")
+                            else:
+                                value = value.replace(v, f"'%{v}%'")
+
                 result += f"{k} {value}{and_or}"
         return result[0:-5]
     
@@ -496,10 +500,8 @@ class QMO:
         res = self.cur.execute(query)
         res_json = self.res_json
         res_json["success"] = True
-        # res_json["length"] = len(res)
-        res_json["time"] = self.time - start
-        res_json["data"] = res
-        res_json["av"] = self.available_fields
+        a_f = self.available_fields
+        res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
     def blunt_query(self):
