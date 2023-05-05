@@ -2,10 +2,10 @@ from flask import Blueprint,  request, render_template, make_response, Response
 from db import QMO
 import sqlite3
 import time
-import orjson as json
+# import orjson as json
 # import cProfile
 # import pstats
-# import msgspec
+import msgspec
 api = Blueprint("api", __name__)
 '''
 
@@ -37,17 +37,15 @@ def r_query(model):
     if data["success"]:
         data["time"] = time.perf_counter() - s
         data["data"] = tuple(data["data"])
+        # encoder = msgspec.json.Encoder()
+        # for msg in data["data"]:
+        #     records = encoder.encode(msg)
+        # data["data"] = records 
         data["length"] = len(data["data"])
-    data = json.dumps(data)
+    # data = json.dumps(data)
+    data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
 
-        # return Response(
-        #     response=json.dumps(
-        #     {
-        #     "data": tuple(data["data"])
-        #     }
-        #     ), mimetype="application/json", status=200
-        # )
     # stats = pstats.Stats(pr)
     # stats.sort_stats(pstats.SortKey.TIME)
     # stats.print_stats()

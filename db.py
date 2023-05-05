@@ -5,6 +5,8 @@ import re
 import json
 import time
 from uuid import uuid4
+import msgspec
+from typing import Optional
 
 def dict_factory(cursor, row):
     d = {}
@@ -19,6 +21,75 @@ def get_db():
     # db.row_factory = dict_factory
     # db.row_factory = sqlite3.Row
     return db
+
+class Per(msgspec.Struct):
+    id: Optional[str] = None
+    t_001: Optional[str] = None
+    t_024: Optional[str] = None
+    t_046: Optional[str] = None
+    t_100: Optional[str] = None
+    t_368: Optional[str] = None
+    t_370: Optional[str] = None
+    t_372: Optional[str] = None
+    t_373: Optional[str] = None
+    t_374: Optional[str] = None
+    t_375: Optional[str] = None
+    t_377: Optional[str] = None
+    t_400: Optional[str] = None
+    t_500: Optional[str] = None
+    t_510: Optional[str] = None
+    t_670: Optional[str] = None
+    otros_identificadores: Optional[str] = None
+    fecha_nacimiento: Optional[str] = None
+    fecha_muerte: Optional[str] = None
+    nombre_de_persona: Optional[str] = None
+    otros_atributos_persona: Optional[str] = None
+    lugar_nacimiento: Optional[str] = None
+    lugar_muerte: Optional[str] = None
+    pais_relacionado: Optional[str] = None
+    otros_lugares_relacionados: Optional[str] = None
+    lugar_residencia: Optional[str] = None
+    campo_actividad: Optional[str] = None
+    grupo_o_entidad_relacionada: Optional[str] = None
+    ocupacion: Optional[str] = None
+    genero: Optional[str] = None
+    lengua: Optional[str] = None
+    otros_nombres: Optional[str] = None
+    persona_relacionada: Optional[str] = None
+    fuentes_de_informacion: Optional[str] = None
+    obras_relacionadas_en_el_catalogo_BNE: Optional[str] = None
+
+class Geo(msgspec.Struct):
+    id:Optional[str] = None
+    t_001:Optional[str] = None
+    t_024:Optional[str] = None
+    t_034:Optional[str] = None
+    t_080:Optional[str] = None
+    t_151:Optional[str] = None
+    t_451:Optional[str] = None
+    t_510:Optional[str] = None
+    t_550:Optional[str] = None
+    t_551:Optional[str] = None
+    t_667:Optional[str] = None
+    t_670:Optional[str] = None
+    t_781:Optional[str] = None
+    otros_identificadores:Optional[str] = None
+    coordenadas_lat_lng:Optional[str] = None
+    CDU:Optional[str] = None
+    nombre_de_lugar:Optional[str] = None
+    otros_nombres_de_lugar:Optional[str] = None
+    entidad_relacionada:Optional[str] = None
+    materia_relacionada:Optional[str] = None
+    lugar_relacionado:Optional[str] = None
+    nota_general:Optional[str] = None
+    fuentes_de_informacion:Optional[str] = None
+    lugar_jerarquico:Optional[str] = None
+    obras_relacionadas_en_el_catalogo_BNE:Optional[str] = None
+
+structs = {
+    "geo": Geo,"per":Per
+}
+
 
 class QMO:
     def __init__(self,dataset:str,  args:dict=None, json_file:str=None):
@@ -485,7 +556,13 @@ class QMO:
             if k in self.virtual_fields:
                 result = f''' INNER JOIN {self.dataset}_fts ON {self.dataset}_fts.id = {self.dataset}.id '''
         return result
+    
+    
+
+
+
     def query(self) -> dict:
+        
         start = self.time
         res_json = self.purgue
         if not res_json["success"]:
@@ -501,7 +578,8 @@ class QMO:
         res_json = self.res_json
         res_json["success"] = True
         a_f = self.available_fields
-        res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
+        res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
+        # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
     def blunt_query(self):
