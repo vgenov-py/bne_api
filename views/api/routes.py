@@ -2,7 +2,9 @@ from flask import Blueprint,  request, render_template, make_response, Response
 from db import QMO
 import sqlite3
 import time
-import ujson as json
+import orjson as json
+import cProfile
+import pstats
 api = Blueprint("api", __name__)
 '''
 
@@ -29,11 +31,20 @@ def r_home():
 def r_query(model):
     s = time.perf_counter()
     test_QMO = QMO(model, request.args)
-    data = test_QMO.query()
-    data = json.dumps(data, ensure_ascii=False).encode("utf-8")
-    res = Response(response=data, mimetype="application/json", status=200)
-    e = time.perf_counter()
-    print("TIME ",e-s, " TIME")
+    with cProfile.Profile() as pr: # http://localhost:3000/api/per?t_375=masculino&limit=1000000
+        data = test_QMO.query()
+        # e = time.perf_counter()
+        # print("DB ",e-s, " DB")
+        # s = time.perf_counter()
+        # data = json.dumps(data)
+        data["data"] = tuple(map(lambda row:dict(zip(data["av"],row)),data["data"]))
+        data = json.dumps(data)
+        res = Response(response=data, mimetype="application/json", status=200)
+        # e = time.perf_counter()
+        # print("JSON ",e-s, " JSON")
+    stats = pstats.Stats(pr)
+    stats.sort_stats(pstats.SortKey.TIME)
+    stats.print_stats()
     return res
 
 @api.route("/entry/<model>")

@@ -16,7 +16,8 @@ def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DB_FILE)
-    db.row_factory = dict_factory
+    # db.row_factory = dict_factory
+    # db.row_factory = sqlite3.Row
     return db
 
 class QMO:
@@ -39,12 +40,15 @@ class QMO:
     
     @property
     def available_fields(self) -> tuple:
-        res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset});")))
+        # res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset});")))
+        return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset});"))]
         return res
     
     @property
     def virtual_fields(self) -> tuple:
-        res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset}_fts);")))
+        # res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset}_fts);")))
+        return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset}_fts);"))]
+
         return res
     
     @property
@@ -489,12 +493,13 @@ class QMO:
         query += self.where(res_json["args"].items())
         query += f" LIMIT {res_json['limit']};"
         print(f"\n{query}\n".center(50 + len(query),"#"))
-        res = list(self.cur.execute(query))
+        res = self.cur.execute(query)
         res_json = self.res_json
         res_json["success"] = True
-        res_json["length"] = len(res)
+        # res_json["length"] = len(res)
         res_json["time"] = self.time - start
         res_json["data"] = res
+        res_json["av"] = self.available_fields
         return res_json
     
     def blunt_query(self):
