@@ -580,7 +580,6 @@ class QMO:
 
     def query(self) -> dict:
         
-        start = self.time
         res_json = self.purgue
         if not res_json["success"]:
             return {"success":False,"message":res_json["message"]}
@@ -597,7 +596,6 @@ class QMO:
         res = self.cur.execute(query)
         res_json = self.res_json
         res_json["success"] = True
-        a_f = self.available_fields
         print(self.dataset)
         res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
         # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)

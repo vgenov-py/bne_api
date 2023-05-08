@@ -1,9 +1,10 @@
-from flask import Flask, g, render_template
+from flask import Flask, g
 import os
 from views.api.routes import api
 from views.home.routes import web
 from constants import SECRET_KEY, DB_FILE
 from flask_cors import CORS
+
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = SECRET_KEY
@@ -20,7 +21,6 @@ def set_db():
 
 app = create_app()
 CORS(app)
-
 
 @app.teardown_appcontext
 def close_connection(exception):
