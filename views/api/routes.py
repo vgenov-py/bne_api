@@ -2,10 +2,9 @@ from flask import Blueprint,  request, render_template, make_response, Response
 from db import QMO
 import sqlite3
 import time
-# import cProfile
-# import pstats
-# import msgspec
-import orjson as json
+import cProfile
+import pstats
+import msgspec
 api = Blueprint("api", __name__)
 '''
 
@@ -31,25 +30,25 @@ def r_home():
 def r_query(model):
     s = time.perf_counter()
     test_QMO = QMO(model, request.args)
-    # with cProfile.Profile() as pr: # http://localhost:3000/api/per?t_375=masculino&limit=1000000
-    data = test_QMO.query()
+    with cProfile.Profile() as pr: # http://localhost:3000/api/per?t_375=masculino&limit=1000000
+        data = test_QMO.query()
 
-    if data["success"]:
-        data["time"] = time.perf_counter() - s
-        data["data"] = tuple(data["data"])
-        # encoder = msgspec.json.Encoder()
-        # for msg in data["data"]:
-        #     records = encoder.encode(msg)
-        # data["data"] = records 
-        data["length"] = len(data["data"])
+        if data["success"]:
+            data["time"] = time.perf_counter() - s
+            data["data"] = tuple(data["data"])
+            # encoder = msgspec.json.Encoder()
+            # for msg in data["data"]:
+            #     records = encoder.encode(msg)
+            # data["data"] = records 
+            data["length"] = len(data["data"])
     # data = json.dumps(data)
-    # data = msgspec.json.encode(data)
-    # res = Response(response=data, mimetype="application/json", status=200)
+    data = msgspec.json.encode(data)
+    res = Response(response=data, mimetype="application/json", status=200)
 
-    # stats = pstats.Stats(pr)
-    # stats.sort_stats(pstats.SortKey.TIME)
-    # stats.print_stats()
-    return data
+    stats = pstats.Stats(pr)
+    stats.sort_stats(pstats.SortKey.TIME)
+    stats.print_stats()
+    return res
 
 @api.route("/entry/<model>")
 def r_entry_data_2(model):
