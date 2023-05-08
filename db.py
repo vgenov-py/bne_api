@@ -136,16 +136,17 @@ class QMO:
     @property
     def marc_fields(self) -> tuple:
         result = ""
-        res = filter(lambda column: column["name"].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column["name"], res):
+        res = filter(lambda column: column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column[1], res):
             result += f", {t}"
         return result[2:]
     
     @property
     def human_fields(self) -> tuple:
         result = ""
-        res = filter(lambda column: not column["name"].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column["name"], res):
+        print(tuple(self.cur.execute(f"pragma table_info({self.dataset});")))
+        res = filter(lambda column: not column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column[1], res):
             result += f", {t}"
         return result[2:]
         
