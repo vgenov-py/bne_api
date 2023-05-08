@@ -107,7 +107,7 @@ class Mon(msgspec.Struct, omit_defaults=True):
     per_id:Optional[str] = None
 
 structs = {
-    "geo": Geo,"per":Per
+    "geo": Geo,"per":Per, "mon":Mon
 }
 
 

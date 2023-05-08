@@ -34,9 +34,9 @@ def r_query(model):
         data = test_QMO.query()
 
         if data["success"]:
-            data["time"] = time.perf_counter() - s
             data["length"] = 0
             data["data"] = tuple(data["data"])
+            data["time"] = time.perf_counter() - s
             data["length"] += len(data["data"])
             # encoder = msgspec.json.Encoder()
             # for msg in data["data"]:
@@ -45,7 +45,7 @@ def r_query(model):
     # data = json.dumps(data)
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
-    res.headers["Access-Control-Allow-Origin"] = "*"
+    # res.headers["Access-Control-Allow-Origin"] = "*"
 
     stats = pstats.Stats(pr)
     stats.sort_stats(pstats.SortKey.TIME)
