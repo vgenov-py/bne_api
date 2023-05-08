@@ -145,8 +145,8 @@ class QMO:
     @property
     def marc_fields(self) -> tuple:
         result = ""
-        res = filter(lambda column: column[0].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column[0], res):
+        res = filter(lambda column: column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column[1], res):
             result += f", {t}"
         return result[2:]
     
@@ -154,8 +154,8 @@ class QMO:
     def human_fields(self) -> tuple:
         result = ""
         print(tuple(self.cur.execute(f"pragma table_info({self.dataset});")))
-        res = filter(lambda column: not column[0].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column[0], res):
+        res = filter(lambda column: not column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column[1], res):
             result += f", {t}"
         return result[2:]
         
@@ -599,9 +599,7 @@ class QMO:
         res_json["success"] = True
         a_f = self.available_fields
         print(self.dataset)
-        def xxx(row):
-            return structs[self.dataset](*row)
-        res_json["data"] = map(lambda row:xxx(row),res)
+        res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
         # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
@@ -631,9 +629,9 @@ class QMO:
 
     def insert(self):
         res_json = {"success":False}
-        with open(f"converter/{self.dataset}.json", encoding="utf-8") as file:
+        with open(f"converter/{self.dataset}.json", mode="rb") as file:
             try:
-                data = json.load(file)
+                data = msgspec.json.decode(file.read())
                 query = f"insert or ignore into {self.dataset} values ({'?, '*len(self.available_fields)})"
                 query = query.replace(", )", ")")
                 print(query.center(50 + len(query), "#"))

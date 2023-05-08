@@ -78,7 +78,7 @@ def r_test():
         "time":delta,
         "data":data
     }
-    res = make_response(json.dumps(data).encode("utf8"))
+    res = make_response(msgspec.json.decode(data).encode("utf8"))
     res.headers["mime-type"] = "application/json"
     print(delta)
     print(time.perf_counter() - start )
