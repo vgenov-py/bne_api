@@ -22,7 +22,7 @@ def get_db():
     # db.row_factory = sqlite3.Row
     return db
 
-class Per(msgspec.Struct):
+class Per(msgspec.Struct, omit_defaults=True):
     id: Optional[str] = None
     t_001: Optional[str] = None
     t_024: Optional[str] = None
@@ -59,7 +59,18 @@ class Per(msgspec.Struct):
     fuentes_de_informacion: Optional[str] = None
     obras_relacionadas_en_el_catalogo_BNE: Optional[str] = None
 
-class Geo(msgspec.Struct):
+# class Per_fts(msgspec.Struct, omit_defaults=True):
+#     id: Optional[str] = None
+#     t_100: Optional[str] = None
+#     t_372: Optional[str] = None
+#     t_374: Optional[str] = None
+#     t_400: Optional[str] = None
+#     nombre_de_persona: Optional[str] = None
+#     campo_actividad: Optional[str] = None
+#     ocupacion: Optional[str] = None
+#     otros_nombres: Optional[str] = None
+
+class Geo(msgspec.Struct, omit_defaults=True):
     id:Optional[str] = None
     t_001:Optional[str] = None
     t_024:Optional[str] = None
@@ -568,7 +579,10 @@ class QMO:
         if not res_json["success"]:
             return {"success":False,"message":res_json["message"]}
         
-        fields = res_json['fields'] if res_json['fields'] else '*'
+        all_fields=""
+        for field in self.available_fields:
+            all_fields += f"{self.dataset}.{field}, "
+        fields = res_json['fields'] if res_json['fields'] else all_fields[0:-2]
         query = f"SELECT {fields} FROM {self.dataset} "
         query += self.fts_add(res_json["args"].keys())
         query += self.where(res_json["args"].items())
@@ -578,7 +592,10 @@ class QMO:
         res_json = self.res_json
         res_json["success"] = True
         a_f = self.available_fields
-        res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
+        print(self.dataset)
+        def xxx(row):
+            return structs[self.dataset](*row)
+        res_json["data"] = map(lambda row:xxx(row),res)
         # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
