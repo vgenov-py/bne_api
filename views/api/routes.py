@@ -42,14 +42,14 @@ def r_query(model):
         #     records = encoder.encode(msg)
         # data["data"] = records 
         data["length"] = len(data["data"])
-    data = json.dumps(data)
+    # data = json.dumps(data)
     # data = msgspec.json.encode(data)
-    res = Response(response=data, mimetype="application/json", status=200)
+    # res = Response(response=data, mimetype="application/json", status=200)
 
     # stats = pstats.Stats(pr)
     # stats.sort_stats(pstats.SortKey.TIME)
     # stats.print_stats()
-    return res
+    return data
 
 @api.route("/entry/<model>")
 def r_entry_data_2(model):
