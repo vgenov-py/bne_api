@@ -2,10 +2,11 @@ from constants import DB_FILE
 import sqlite3
 from flask import g
 import re
-import json
+import orjson as json
 import time
 from uuid import uuid4
-import msgspec
+
+# import msgspec
 from typing import Optional
 
 def dict_factory(cursor, row):
@@ -18,88 +19,88 @@ def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = sqlite3.connect(DB_FILE)
-    # db.row_factory = dict_factory
+    db.row_factory = dict_factory
     # db.row_factory = sqlite3.Row
     return db
 
-class Per(msgspec.Struct, omit_defaults=True):
-    id: Optional[str] = None
-    t_001: Optional[str] = None
-    t_024: Optional[str] = None
-    t_046: Optional[str] = None
-    t_100: Optional[str] = None
-    t_368: Optional[str] = None
-    t_370: Optional[str] = None
-    t_372: Optional[str] = None
-    t_373: Optional[str] = None
-    t_374: Optional[str] = None
-    t_375: Optional[str] = None
-    t_377: Optional[str] = None
-    t_400: Optional[str] = None
-    t_500: Optional[str] = None
-    t_510: Optional[str] = None
-    t_670: Optional[str] = None
-    otros_identificadores: Optional[str] = None
-    fecha_nacimiento: Optional[str] = None
-    fecha_muerte: Optional[str] = None
-    nombre_de_persona: Optional[str] = None
-    otros_atributos_persona: Optional[str] = None
-    lugar_nacimiento: Optional[str] = None
-    lugar_muerte: Optional[str] = None
-    pais_relacionado: Optional[str] = None
-    otros_lugares_relacionados: Optional[str] = None
-    lugar_residencia: Optional[str] = None
-    campo_actividad: Optional[str] = None
-    grupo_o_entidad_relacionada: Optional[str] = None
-    ocupacion: Optional[str] = None
-    genero: Optional[str] = None
-    lengua: Optional[str] = None
-    otros_nombres: Optional[str] = None
-    persona_relacionada: Optional[str] = None
-    fuentes_de_informacion: Optional[str] = None
-    obras_relacionadas_en_el_catalogo_BNE: Optional[str] = None
-
-# class Per_fts(msgspec.Struct, omit_defaults=True):
+# class Per(msgspec.Struct, omit_defaults=True):
 #     id: Optional[str] = None
+#     t_001: Optional[str] = None
+#     t_024: Optional[str] = None
+#     t_046: Optional[str] = None
 #     t_100: Optional[str] = None
+#     t_368: Optional[str] = None
+#     t_370: Optional[str] = None
 #     t_372: Optional[str] = None
+#     t_373: Optional[str] = None
 #     t_374: Optional[str] = None
+#     t_375: Optional[str] = None
+#     t_377: Optional[str] = None
 #     t_400: Optional[str] = None
+#     t_500: Optional[str] = None
+#     t_510: Optional[str] = None
+#     t_670: Optional[str] = None
+#     otros_identificadores: Optional[str] = None
+#     fecha_nacimiento: Optional[str] = None
+#     fecha_muerte: Optional[str] = None
 #     nombre_de_persona: Optional[str] = None
+#     otros_atributos_persona: Optional[str] = None
+#     lugar_nacimiento: Optional[str] = None
+#     lugar_muerte: Optional[str] = None
+#     pais_relacionado: Optional[str] = None
+#     otros_lugares_relacionados: Optional[str] = None
+#     lugar_residencia: Optional[str] = None
 #     campo_actividad: Optional[str] = None
+#     grupo_o_entidad_relacionada: Optional[str] = None
 #     ocupacion: Optional[str] = None
+#     genero: Optional[str] = None
+#     lengua: Optional[str] = None
 #     otros_nombres: Optional[str] = None
+#     persona_relacionada: Optional[str] = None
+#     fuentes_de_informacion: Optional[str] = None
+#     obras_relacionadas_en_el_catalogo_BNE: Optional[str] = None
 
-class Geo(msgspec.Struct, omit_defaults=True):
-    id:Optional[str] = None
-    t_001:Optional[str] = None
-    t_024:Optional[str] = None
-    t_034:Optional[str] = None
-    t_080:Optional[str] = None
-    t_151:Optional[str] = None
-    t_451:Optional[str] = None
-    t_510:Optional[str] = None
-    t_550:Optional[str] = None
-    t_551:Optional[str] = None
-    t_667:Optional[str] = None
-    t_670:Optional[str] = None
-    t_781:Optional[str] = None
-    otros_identificadores:Optional[str] = None
-    coordenadas_lat_lng:Optional[str] = None
-    CDU:Optional[str] = None
-    nombre_de_lugar:Optional[str] = None
-    otros_nombres_de_lugar:Optional[str] = None
-    entidad_relacionada:Optional[str] = None
-    materia_relacionada:Optional[str] = None
-    lugar_relacionado:Optional[str] = None
-    nota_general:Optional[str] = None
-    fuentes_de_informacion:Optional[str] = None
-    lugar_jerarquico:Optional[str] = None
-    obras_relacionadas_en_el_catalogo_BNE:Optional[str] = None
+# # class Per_fts(msgspec.Struct, omit_defaults=True):
+# #     id: Optional[str] = None
+# #     t_100: Optional[str] = None
+# #     t_372: Optional[str] = None
+# #     t_374: Optional[str] = None
+# #     t_400: Optional[str] = None
+# #     nombre_de_persona: Optional[str] = None
+# #     campo_actividad: Optional[str] = None
+# #     ocupacion: Optional[str] = None
+# #     otros_nombres: Optional[str] = None
 
-structs = {
-    "geo": Geo,"per":Per
-}
+# class Geo(msgspec.Struct, omit_defaults=True):
+#     id:Optional[str] = None
+#     t_001:Optional[str] = None
+#     t_024:Optional[str] = None
+#     t_034:Optional[str] = None
+#     t_080:Optional[str] = None
+#     t_151:Optional[str] = None
+#     t_451:Optional[str] = None
+#     t_510:Optional[str] = None
+#     t_550:Optional[str] = None
+#     t_551:Optional[str] = None
+#     t_667:Optional[str] = None
+#     t_670:Optional[str] = None
+#     t_781:Optional[str] = None
+#     otros_identificadores:Optional[str] = None
+#     coordenadas_lat_lng:Optional[str] = None
+#     CDU:Optional[str] = None
+#     nombre_de_lugar:Optional[str] = None
+#     otros_nombres_de_lugar:Optional[str] = None
+#     entidad_relacionada:Optional[str] = None
+#     materia_relacionada:Optional[str] = None
+#     lugar_relacionado:Optional[str] = None
+#     nota_general:Optional[str] = None
+#     fuentes_de_informacion:Optional[str] = None
+#     lugar_jerarquico:Optional[str] = None
+#     obras_relacionadas_en_el_catalogo_BNE:Optional[str] = None
+
+# structs = {
+#     "geo": Geo,"per":Per
+# }
 
 
 class QMO:
@@ -122,22 +123,22 @@ class QMO:
     
     @property
     def available_fields(self) -> tuple:
-        # res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset});")))
-        return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset});"))]
+        res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset});")))
+        # return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset});"))]
         return res
     
     @property
     def virtual_fields(self) -> tuple:
-        # res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset}_fts);")))
-        return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset}_fts);"))]
+        res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset}_fts);")))
+        # return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset}_fts);"))]
 
         return res
     
     @property
     def marc_fields(self) -> tuple:
         result = ""
-        res = filter(lambda column: column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column[1], res):
+        res = filter(lambda column: column["name"].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column["name"], res):
             result += f", {t}"
         return result[2:]
     
@@ -145,8 +146,8 @@ class QMO:
     def human_fields(self) -> tuple:
         result = ""
         print(tuple(self.cur.execute(f"pragma table_info({self.dataset});")))
-        res = filter(lambda column: not column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column[1], res):
+        res = filter(lambda column: not column["name"].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
+        for t in map(lambda column: column["name"], res):
             result += f", {t}"
         return result[2:]
         
@@ -594,10 +595,10 @@ class QMO:
         res_json["success"] = True
         a_f = self.available_fields
         print(self.dataset)
-        def xxx(row):
-            return structs[self.dataset](*row)
-        res_json["data"] = map(lambda row:xxx(row),res)
-        # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
+        # def xxx(row):
+        #     return structs[self.dataset](*row)
+        # res_json["data"] = map(lambda row:xxx(row),res)
+        res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
     def blunt_query(self):

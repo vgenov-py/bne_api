@@ -4,7 +4,8 @@ import sqlite3
 import time
 # import cProfile
 # import pstats
-import msgspec
+# import msgspec
+import orjson as json
 api = Blueprint("api", __name__)
 '''
 
@@ -41,8 +42,8 @@ def r_query(model):
         #     records = encoder.encode(msg)
         # data["data"] = records 
         data["length"] = len(data["data"])
-    # data = json.dumps(data)
-    data = msgspec.json.encode(data)
+    data = json.dumps(data)
+    # data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
 
     # stats = pstats.Stats(pr)
