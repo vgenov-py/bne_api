@@ -5,6 +5,7 @@ import time
 import cProfile
 import pstats
 import msgspec
+# import orjson as json
 api = Blueprint("api", __name__)
 '''
 
@@ -45,10 +46,22 @@ def r_entry_data_2(model):
     test_QMO = QMO(model, f"converter/{model}.json")
     return test_QMO.insert()
 
-@api.route("/blunt")
-def r_blunt_query():
-    res = QMO("", request.args)
-    return res.blunt_query()
+@api.route("/blunt/<model>")
+def r_blunt_query(model):
+    res = QMO(model, request.args)
+    with cProfile.Profile() as pr: # http://localhost:3000/api/per?t_375=masculino&limit=1000000
+
+        data = res.blunt_query()
+        if data["success"]:
+            data["data"] = tuple(data["data"])
+        # data = json.dumps(data)
+        data = msgspec.json.encode(data)
+        res = Response(response=data, mimetype="application/json", status=200)
+    stats = pstats.Stats(pr)
+    stats.sort_stats(pstats.SortKey.TIME)
+    stats.print_stats()
+    return res
+
 
 @api.route("/test")
 def r_test():

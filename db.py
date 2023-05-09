@@ -538,6 +538,9 @@ class QMO:
         return res_json
     
     def where(self, args: dict) -> str:
+        args = dict(args)
+        if not args:
+            return ""
         result = "WHERE "
         and_or = " AND "
         for k,value in args:
@@ -626,14 +629,15 @@ class QMO:
                     return res_json
         print(query)
         try:
-            res = list(self.cur.execute(query))
+            # res = list(self.cur.execute(query))
+            def xxx(row):
+                print(row)
+            res = self.cur.execute(query)
         except Exception as e:
             res_json["message"] = "Bad formulated query"
             res_json["error"] = f"{e}"
             return res_json
         res_json["success"] = True
-        res_json["length"] = len(res)
-        res_json["time"] = self.time - start
         res_json["data"] = res
         return res_json
 
