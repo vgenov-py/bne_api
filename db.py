@@ -6,7 +6,7 @@ import time
 from uuid import uuid4
 import msgspec
 from typing import Optional
-
+import datetime as dt
 
 def dict_factory(cursor, row):
     d = {}
@@ -608,6 +608,12 @@ class QMO:
         query += self.where(res_json["args"].items())
         query += f" LIMIT {res_json['limit']};"
         print(f"\n{query}\n".center(50 + len(query),"#"))
+        with open("logs/query.log", mode="r+", encoding="utf-8") as file:
+            if len(file.readlines()) <= 10:
+                file.write("")
+            lines = file.readlines()
+            lines.extend(f"{dt.datetime.now()}|{query}\n")
+            file.writelines(lines)
         res = self.cur.execute(query)
         res_json = self.res_json
         res_json["success"] = True
