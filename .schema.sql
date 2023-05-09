@@ -35,6 +35,11 @@ CREATE TABLE per (
     fuentes_de_informacion TEXT,
     obras_relacionadas_en_el_catalogo_BNE TEXT
     );
+CREATE TABLE IF NOT EXISTS 'per_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
+CREATE TABLE IF NOT EXISTS 'per_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
+CREATE TABLE IF NOT EXISTS 'per_fts_content'(id INTEGER PRIMARY KEY, c0, c1, c2, c3, c4, c5, c6, c7, c8);
+CREATE TABLE IF NOT EXISTS 'per_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
+CREATE TABLE IF NOT EXISTS 'per_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
 CREATE TABLE mon (
     id TEXT PRIMARY KEY,
     t_001 TEXT,
@@ -55,36 +60,11 @@ CREATE TABLE mon (
     t_994 TEXT,
     per_id TEXT
     );
-CREATE VIRTUAL TABLE per_fts USING FTS5(
-        id,
-        t_100,
-        t_372,
-        t_374,
-        t_400,
-        nombre_de_persona,
-        campo_actividad,
-        ocupacion,
-        otros_nombres,
-        tokenize="unicode61 separators '|a'")
-/* per_fts(id,t_100,t_372,t_374,t_400,nombre_de_persona,campo_actividad,ocupacion,otros_nombres) */;
-CREATE TABLE IF NOT EXISTS 'per_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
-CREATE TABLE IF NOT EXISTS 'per_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS 'per_fts_content'(id INTEGER PRIMARY KEY, c0, c1, c2, c3, c4, c5, c6, c7, c8);
-CREATE TABLE IF NOT EXISTS 'per_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
-CREATE TABLE IF NOT EXISTS 'per_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE VIRTUAL TABLE mon_fts USING FTS5(
-        id,
-        t_100,
-        t_245,
-        tokenize="unicode61 separators '|a'")
-/* mon_fts(id,t_100,t_245) */;
 CREATE TABLE IF NOT EXISTS 'mon_fts_data'(id INTEGER PRIMARY KEY, block BLOB);
 CREATE TABLE IF NOT EXISTS 'mon_fts_idx'(segid, term, pgno, PRIMARY KEY(segid, term)) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS 'mon_fts_content'(id INTEGER PRIMARY KEY, c0, c1, c2);
 CREATE TABLE IF NOT EXISTS 'mon_fts_docsize'(id INTEGER PRIMARY KEY, sz BLOB);
 CREATE TABLE IF NOT EXISTS 'mon_fts_config'(k PRIMARY KEY, v) WITHOUT ROWID;
-CREATE INDEX mon_per_id on mon(id,per_id);
-CREATE INDEX per_375 on per(id,t_375);
 CREATE TABLE geo (
         id TEXT PRIMARY KEY,
         t_001 TEXT,
@@ -112,3 +92,27 @@ CREATE TABLE geo (
         lugar_jerarquico TEXT,
         obras_relacionadas_en_el_catalogo_BNE TEXT
     );
+CREATE INDEX per_id on per(id);
+CREATE INDEX per_375 on per(t_375);
+CREATE INDEX per_genero on per(genero);
+CREATE INDEX mon_id on mon(id);
+CREATE INDEX mon_t100 on mon(t_100);
+CREATE INDEX mon_t245 on mon(t_245);
+CREATE VIRTUAL TABLE per_fts USING FTS5(
+        id,
+        t_100,
+        t_372,
+        t_374,
+        t_400,
+        nombre_de_persona,
+        campo_actividad,
+        ocupacion,
+        otros_nombres,
+        tokenize="unicode61 separators '|a'")
+/* per_fts(id,t_100,t_372,t_374,t_400,nombre_de_persona,campo_actividad,ocupacion,otros_nombres) */;
+CREATE VIRTUAL TABLE mon_fts USING FTS5(
+        id,
+        t_100,
+        t_245,
+        tokenize="unicode61 separators '|a'")
+/* mon_fts(id,t_100,t_245) */;

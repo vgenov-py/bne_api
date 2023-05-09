@@ -22,7 +22,7 @@ def get_db():
     # db.row_factory = sqlite3.Row
     return db
 
-class Per(msgspec.Struct, omit_defaults=True):
+class Per(msgspec.Struct, omit_defaults=True, gc=True):
     id: Optional[str] = None
     t_001: Optional[str] = None
     t_024: Optional[str] = None
@@ -145,18 +145,24 @@ class QMO:
     @property
     def marc_fields(self) -> tuple:
         result = ""
-        res = filter(lambda column: column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column[1], res):
-            result += f", {t}"
+        for field in self.cur.execute(f"pragma table_info({self.dataset});"):
+            field:str = field[1]
+            if field.startswith("t_"):
+                result += f", {field}"
+            else:
+                result += f", NULL"
         return result[2:]
+
     
     @property
     def human_fields(self) -> tuple:
         result = ""
-        print(tuple(self.cur.execute(f"pragma table_info({self.dataset});")))
-        res = filter(lambda column: not column[1].startswith("t_"), self.cur.execute(f"pragma table_info({self.dataset});"))
-        for t in map(lambda column: column[1], res):
-            result += f", {t}"
+        for field in self.cur.execute(f"pragma table_info({self.dataset});"):
+            field:str = field[1]
+            if not field.startswith("t_"):
+                result += f", {field}"
+            else:
+                result += f", NULL"
         return result[2:]
         
     @property
@@ -508,7 +514,13 @@ class QMO:
                 return res_json
             field:str = f"{self.dataset}.{field.strip()}"
         if fields:
-            res_json["fields"] = f'''{self.dataset}.{fields.replace(",",f",{self.dataset}.")}'''
+            result = ""
+            for field in self.available_fields:
+                if field in fields.split(","):
+                    result += f",{self.dataset}.{field}"
+                else:
+                    result += f",NULL"
+            res_json["fields"] = result[1:]
         else:
             res_json["fields"] = fields
         
@@ -587,7 +599,7 @@ class QMO:
         all_fields=""
         for field in self.available_fields:
             all_fields += f"{self.dataset}.{field}, "
-        fields = res_json['fields'] if res_json['fields'] else all_fields[0:-2]
+        fields = res_json['fields'] if res_json['fields'] else all_fields[0:-2] #TODO: put all fields after and make always the conversion to -> dataset.field
         query = f"SELECT {fields} FROM {self.dataset} "
         query += self.fts_add(res_json["args"].keys())
         query += self.where(res_json["args"].items())

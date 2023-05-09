@@ -21,11 +21,6 @@ def r_home():
     test = QMO("per")
     return render_template("index.html")
 
-# @api.route("/<model>")
-# def r_query(model):
-#     test_QMO = QMO(model, request.args)
-#     return test_QMO.query()
-
 @api.route("/<model>")
 def r_query(model):
     s = time.perf_counter()
@@ -38,15 +33,8 @@ def r_query(model):
             data["data"] = tuple(data["data"])
             data["time"] = time.perf_counter() - s
             data["length"] += len(data["data"])
-            # encoder = msgspec.json.Encoder()
-            # for msg in data["data"]:
-            #     records = encoder.encode(msg)
-            # data["data"] = records 
-    # data = json.dumps(data)
-    data = msgspec.json.encode(data)
-    res = Response(response=data, mimetype="application/json", status=200)
-    # res.headers["Access-Control-Allow-Origin"] = "*"
-
+        data = msgspec.json.encode(data)
+        res = Response(response=data, mimetype="application/json", status=200)
     stats = pstats.Stats(pr)
     stats.sort_stats(pstats.SortKey.TIME)
     stats.print_stats()
