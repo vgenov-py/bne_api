@@ -35,6 +35,7 @@ def r_query(model):
             data["time"] = time.perf_counter() - s
             data["length"] += len(data["data"])
         data = msgspec.json.encode(data)
+        # data = json.dumps(data)
         res = Response(response=data, mimetype="application/json", status=200)
     stats = pstats.Stats(pr)
     stats.sort_stats(pstats.SortKey.TIME)

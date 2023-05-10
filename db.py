@@ -22,7 +22,7 @@ def get_db():
     # db.row_factory = sqlite3.Row
     return db
 
-class Per(msgspec.Struct, omit_defaults=True, gc=True):
+class Per(msgspec.Struct):
     id: Optional[str] = None
     t_001: Optional[str] = None
     t_024: Optional[str] = None
