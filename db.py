@@ -25,8 +25,8 @@ def get_db():
 '''
 FOR TESTING PURPOSE:
 '''
-# def get_db():
-#     return sqlite3.connect(DB_FILE)
+def get_db():
+    return sqlite3.connect(DB_FILE)
 
 
 
@@ -583,8 +583,8 @@ class QMO:
                                 value = value.replace(v, f"'%{v}%'")
 
                 result += f"{k} {value}{and_or}"
-        result = result.replace("%' '|%", " ")
-        result = result.replace("%' '%", " ")
+        result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
+        print(f"RESULT    :{result}" )
         return result[0:-5]
     
     def fts_add(self,args:list) -> str:
