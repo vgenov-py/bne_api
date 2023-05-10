@@ -27,9 +27,14 @@ class test_QMO(unittest.TestCase):
     WHERE:
     '''
 
-    # def test_where(self):
-    #     args = {"id":"XX100900"}
-    #     self.assertEqual(self.per.where(args), '''WHERE id LIKE "%XX100900%"''')
+    def test_where(self):
+        args = {"id":"XX100900"}
+        where_id = '''WHERE  per_fts match \'id:NEAR("XX100900")\'  '''
+        self.assertEqual(self.per.where(args), where_id)
+        args = {"id": "XX", "t_100": "Fernández"}
+        self.assertEqual(self.per.where(args), '''WHERE  per_fts match 'id:NEAR("XX")'   AND  per_fts match 't_100:NEAR("Fernández")\'  ''')
+        args = {"id": "XX", "t_375": "mas culino","t_300": "!some value"}
+        self.assertEqual(self.per.where(args), '''WHERE  per_fts match 'id:NEAR("XX")'   AND t_375 LIKE '|%mas culino%\'''')
 
     '''
     GEO:
@@ -89,6 +94,13 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.mon_per_id("|aAntón, Francisco|qAntón Alted"), None)
         self.assertEqual(self.per.mon_per_id(None), None)
         self.assertEqual(self.per.mon_per_id(""), None)
+
+    '''
+    PURGUE:
+    '''
+
+    def test_purgue(self):
+        self.assertEqual(self.n_1.purgue, {'success': True, 'limit': 1, 'fields': None, 'args': {'id': 'XX1000003'}})
 
 if __name__ == '__main__':
     qmo_funcs = tuple(filter(lambda func: not func.startswith("__"),dir(qmo_funcs)))

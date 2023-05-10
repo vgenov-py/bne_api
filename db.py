@@ -2,18 +2,18 @@ from constants import DB_FILE
 import sqlite3
 from flask import g
 import re
-import time
 from uuid import uuid4
 import msgspec
 from typing import Optional
 import datetime as dt
+import orjson as json
+import time
 
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-
+# def dict_factory(cursor, row):
+#     d = {}
+#     for idx, col in enumerate(cursor.description):
+#         d[col[0]] = row[idx]
+#     return d
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -21,6 +21,14 @@ def get_db():
     # db.row_factory = dict_factory
     # db.row_factory = sqlite3.Row
     return db
+
+'''
+FOR TESTING PURPOSE:
+'''
+# def get_db():
+#     return sqlite3.connect(DB_FILE)
+
+
 
 class Per(msgspec.Struct):
     id: Optional[str] = None
@@ -59,7 +67,7 @@ class Per(msgspec.Struct):
     fuentes_de_informacion: Optional[str] = None
     obras_relacionadas_en_el_catalogo_BNE: Optional[str] = None
 
-class Geo(msgspec.Struct, omit_defaults=True):
+class Geo(msgspec.Struct):
     id:Optional[str] = None
     t_001:Optional[str] = None
     t_024:Optional[str] = None
@@ -86,7 +94,7 @@ class Geo(msgspec.Struct, omit_defaults=True):
     lugar_jerarquico:Optional[str] = None
     obras_relacionadas_en_el_catalogo_BNE:Optional[str] = None
 
-class Mon(msgspec.Struct, omit_defaults=True):
+class Mon(msgspec.Struct):
     id:Optional[str] = None
     t_001:Optional[str] = None
     t_008:Optional[str] = None
@@ -116,10 +124,6 @@ class QMO:
         self.dataset = dataset
         self.args = args
         self.json_file = json_file
-
-    @property
-    def time(self):
-        return time.perf_counter()
     
     @property
     def con(self):
@@ -130,20 +134,15 @@ class QMO:
         return self.con.cursor()
     
     @property
-    def available_fields(self) -> tuple:
-        # res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset});")))
-        return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset});"))]
-        return res
+    def available_fields(self) -> list:
+        return [row[1] for row in self.cur.execute(f"pragma table_info({self.dataset});")]
     
     @property
-    def virtual_fields(self) -> tuple:
-        # res = tuple(map(lambda column: column["name"], self.cur.execute(f"pragma table_info({self.dataset}_fts);")))
-        return [row[1] for row in tuple(self.cur.execute(f"pragma table_info({self.dataset}_fts);"))]
-
-        return res
+    def virtual_fields(self) -> list:
+        return [row[1] for row in self.cur.execute(f"pragma table_info({self.dataset}_fts);")]
     
     @property
-    def marc_fields(self) -> tuple:
+    def marc_fields(self) -> str:
         result = ""
         for field in self.cur.execute(f"pragma table_info({self.dataset});"):
             field:str = field[1]
@@ -155,7 +154,7 @@ class QMO:
 
     
     @property
-    def human_fields(self) -> tuple:
+    def human_fields(self) -> str:
         result = ""
         for field in self.cur.execute(f"pragma table_info({self.dataset});"):
             field:str = field[1]
@@ -549,7 +548,6 @@ class QMO:
             VIRTUAL START
             '''
             if k in self.virtual_fields:
-                print(k.center(100,"#"))
                 v = re.sub("\|\||¬|!", "", value)
                 v_where = f''' {self.dataset}_fts match '{k}:NEAR("{v}")'  {and_or}'''
                 result += v_where
@@ -568,6 +566,7 @@ class QMO:
                 value = value.replace("||", f" OR {k} LIKE ")
                 value = value.replace("¬", f" AND {k} LIKE ")
                 value = value.replace("LIKE !", "NOT LIKE ")
+                print(value)
                 value_splitted = value.split(" ")
                 for v in value_splitted:
                     if v.islower() and v not in self.available_fields or not v.isalnum():
@@ -584,6 +583,8 @@ class QMO:
                                 value = value.replace(v, f"'%{v}%'")
 
                 result += f"{k} {value}{and_or}"
+        result = result.replace("%' '|%", " ")
+        result = result.replace("%' '%", " ")
         return result[0:-5]
     
     def fts_add(self,args:list) -> str:
@@ -623,7 +624,6 @@ class QMO:
         return res_json
     
     def blunt_query(self):
-        start = self.time
         query: str = self.args.get("query")
         res_json = self.res_json
         blacklisted = ("update", "delete", "create", "insert", "pragma", "table_info", "drop", "alter" , "commit", "into")
@@ -636,8 +636,6 @@ class QMO:
         print(query)
         try:
             # res = list(self.cur.execute(query))
-            def xxx(row):
-                print(row)
             res = self.cur.execute(query)
         except Exception as e:
             res_json["message"] = "Bad formulated query"
@@ -649,15 +647,17 @@ class QMO:
 
     def insert(self):
         res_json = {"success":False}
-        with open(f"converter/{self.dataset}.json", mode="rb") as file:
+        with open(f"converter/{self.dataset}.json", encoding="utf-8") as file:
             try:
-                data = msgspec.json.decode(file.read())
+                s = time.perf_counter()
+                data = json.loads(file.read())
                 query = f"insert or ignore into {self.dataset} values ({'?, '*len(self.available_fields)})"
                 query = query.replace(", )", ")")
                 print(query.center(50 + len(query), "#"))
                 self.cur.executemany(query,map(lambda record: self.extract_values(self.dataset, record), data))
                 self.con.commit()
                 res_json["success"] = True
+                res_json["time"] = time.perf_counter() - s
                 return res_json
             except Exception as e:
                 res_json["message"] = f"{e}"
