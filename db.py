@@ -566,10 +566,9 @@ class QMO:
                 value = value.replace("||", f" OR {k} LIKE ")
                 value = value.replace("¬", f" AND {k} LIKE ")
                 value = value.replace("LIKE !", "NOT LIKE ")
-                print(value)
                 value_splitted = value.split(" ")
                 for v in value_splitted:
-                    if v.islower() and v not in self.available_fields or not v.isalnum():
+                    if v.islower() and v not in self.available_fields or not v.isalnum() and v:
                         if v == "null":
                             value = value.replace(v, "NULL")
                             if value.find("NOT LIKE NULL") >= 0:
@@ -582,9 +581,8 @@ class QMO:
                             else:
                                 value = value.replace(v, f"'%{v}%'")
 
-                result += f"{k} {value}{and_or}"
+                result += f"{k} {value}{and_or}"        
         result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
-        print(f"RESULT    :{result}" )
         return result[0:-5]
     
     def fts_add(self,args:list) -> str:
