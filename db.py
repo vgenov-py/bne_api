@@ -543,7 +543,7 @@ class QMO:
             return ""
         result = "WHERE "
         and_or = " AND "
-        for k,value in args:
+        for k,value in args.items():
 
             '''
             VIRTUAL START
