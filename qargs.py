@@ -21,7 +21,7 @@ class Qargs:
         self.args = args
 
     @property
-    def cur(self):
+    def cur(self) -> sqlite3.Connection:
         return sqlite3.connect(DB_FILE)
     
     @property
@@ -45,12 +45,23 @@ class Qargs:
         return self.args.get("fields")
     
     @property
+    def filters(self) -> dict:
+        return self.args.get("filters")
+    
+    @property
     def available_fields(self) -> tuple:
         result = (f"{self.table}.{row[1]}" for row in self.cur.execute(f"pragma table_info({self.table});"))
         return tuple(result)
-    
 
-
+    @property
+    def select(self) -> str:
+        result = "SELECT "
+        if self.fields:
+            result += self.fields
+            return result
+        for field in self.available_fields:
+            result += f"{field}, "
+        return result[:-2]
 if __name__ == "__main__":
     import os
     os.system("python3 test_qargs.py")
