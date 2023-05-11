@@ -30,7 +30,7 @@ def get_db():
 
 
 
-class Per(msgspec.Struct):
+class Per(msgspec.Struct, omit_defaults=True):
     id: Optional[str] = None
     t_001: Optional[str] = None
     t_024: Optional[str] = None
@@ -94,7 +94,7 @@ class Geo(msgspec.Struct):
     lugar_jerarquico:Optional[str] = None
     obras_relacionadas_en_el_catalogo_BNE:Optional[str] = None
 
-class Mon(msgspec.Struct):
+class Mon(msgspec.Struct, omit_defaults=True):
     id:Optional[str] = None
     t_001:Optional[str] = None
     t_008:Optional[str] = None
@@ -396,7 +396,6 @@ class QMO:
         else:
             return        
 
-    
     def per_person_name(self, value: str) -> str:
         if not value:
             return
@@ -493,12 +492,33 @@ class QMO:
             return result
         
     @property
-    def purgue(self):
+    def purgue(self) -> dict:
+        f'''
+        This function will clean the data coming from the query params and also will raise errors when one or
+        more fields where bad designated or mal used
+
+        purgue() will return a dict/json object that can contain the followings:
+        success: boolean
+        limit: int
+        view: human|marc
+        fields: []string
+        dataset_2: dict:string
+        args: dict:string
+        message: string
+
+        when success == False a message will be supplied with the error that has occurred
+        '''
         res_json = self.res_json
         args = self.args.copy()
         fields = args.pop("fields", None)
         limit = args.pop("limit", "1000")
         view = args.pop("view", False)
+        for k in args.keys():
+            if k in structs.keys():
+                dataset_2 = {k:args.pop(k)}
+                break
+            else:
+                dataset_2 = None
         if limit:
             try:
                  int(limit)
@@ -534,16 +554,22 @@ class QMO:
                 res_json["fields"] = self.human_fields
         res_json["args"] = args
         res_json["success"] = True
+        res_json["dataset_2"] = dataset_2
         return res_json
     
-    def where(self, args: dict) -> str:
+    def where(self, args: dict, dataset:str = None) -> str:
+        '''
+        where() will return a valid sqlite3 query syntax formed by the args supplied
+        dataset: [str]|None
+        if dataset supplied, will build the query based on a different dataset from the one available on self properties
+        '''
+        dataset = dataset if dataset else self.dataset  
         args = dict(args)
         if not args:
             return ""
         result = "WHERE "
         and_or = " AND "
         for k,value in args.items():
-
             '''
             VIRTUAL START
             '''
@@ -552,6 +578,7 @@ class QMO:
                 v_where = f''' {self.dataset}_fts match '{k}:NEAR("{v}")'  {and_or}'''
                 result += v_where
             else:
+                k = f"{dataset}.{k}"
                 value: str = value.lower()
                 if value[-2:] == "||":
                     and_or = " OR  "
@@ -592,6 +619,16 @@ class QMO:
                 result = f''' INNER JOIN {self.dataset}_fts ON {self.dataset}_fts.id = {self.dataset}.id '''
         return result
 
+    def joining(self, dataset_2:dict) -> str:
+        dataset = list(dataset_2.keys())[0].strip()
+        result = {dataset:{}}
+        filters = dataset_2[dataset].split(":") 
+        for v in filters:
+            k = filters.pop(0)
+            v = filters.pop(0)
+            result[dataset][k] = v.strip()
+        return result
+    
     def query(self) -> dict:
         
         res_json = self.purgue
@@ -604,8 +641,18 @@ class QMO:
         fields = res_json['fields'] if res_json['fields'] else all_fields[0:-2] #TODO: put all fields after and make always the conversion to -> dataset.field
         query = f"SELECT {fields} FROM {self.dataset} "
         query += self.fts_add(res_json["args"].keys())
-        query += self.where(res_json["args"].items())
-        query += f" LIMIT {res_json['limit']};"
+        if res_json["dataset_2"]:
+            print(res_json["dataset_2"])
+            joining_dict = self.joining(res_json["dataset_2"])
+            joining_where = self.where(joining_dict["per"], "per")
+            where = self.where(res_json["args"].items())
+            joining_where = where.replace("WHERE", f"{joining_where} AND ")
+            joining_where = joining_where.replace("WHERE", f"INNER JOIN per ON per.id = mon.per_id WHERE ")
+            print(joining_where)
+            query += joining_where
+        else:
+            query += self.where(res_json["args"].items())
+        query += f" LIMIT {res_json['limit']};" 
         print(f"\n{query}\n".center(50 + len(query),"#"))
         with open("logs/query.log", mode="r+", encoding="utf-8") as file:
             if len(file.readlines()) <= 10:
@@ -618,6 +665,7 @@ class QMO:
         res_json["success"] = True
         print(self.dataset)
         res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
+        res_json["query"] = query
         # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
