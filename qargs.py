@@ -8,21 +8,32 @@ from typing import Optional
 class Qargs:
     '''
     Qargs (Query from args)
-    This object will create a valid sqlite3 SELECT query based on args supplied
-    args have to be previously curated
-    args can contain one or more of the followings:
+    This object will create a valid sqlite3 SELECT query based on args supplied\n
+    args have to be previously curated\n
+    args can contain one or more of the followings:\n
     table:str
-    fields:[[]str]
-    filters: [k=v,...]|None
+    fields:[[]str]|None
+    filters: {k:v,...}|None
     join: [k:v,...]|None
     limit:int|1000
     '''
-    def __init__(self,args:dict) -> None:
-        self.args = args
+    def __init__(self,model:str, args:dict) -> None:
+        self.model = model
+        self.pre_args = args
 
     @property
     def cur(self) -> sqlite3.Connection:
         return sqlite3.connect(DB_FILE)
+    
+    @property
+    def args(self) -> dict:
+        r = {}
+        pre_args = self.pre_args.copy()
+        r["table"] = self.model
+        r["limit"] = pre_args.pop("limit", "1000")
+        r["fields"] = pre_args.pop("fields", None)
+        r["filters"] = pre_args
+        return r
     
     @property
     def table(self) -> str:
@@ -58,10 +69,23 @@ class Qargs:
         result = "SELECT "
         if self.fields:
             result += self.fields
-            return result
+            return f"{result} FROM {self.table}"
         for field in self.available_fields:
             result += f"{field}, "
-        return result[:-2]
+        return f"{result[:-2]} FROM {self.table}"
+    
+    @property
+    def where(self) -> str:
+        result = "WHERE "
+        for k,v in self.filters.items():
+            result += f"{self.table}.{k} LIKE '%{v}%' AND "
+        return result[:-5]
+    
+    @property
+    def query(self) -> str:
+        result = f"{self.select} {self.where} LIMIT 1000;"
+        return result
+
 if __name__ == "__main__":
     import os
     os.system("python3 test_qargs.py")
