@@ -92,6 +92,7 @@ query_create_mon = f'''
     t_020 TEXT,
     t_035 TEXT,
     t_040 TEXT,
+    t_041 TEXT,
     t_100 TEXT,
     t_130 TEXT,
     t_245 TEXT,

@@ -25,8 +25,8 @@ def get_db():
 '''
 FOR TESTING PURPOSE:
 '''
-def get_db():
-    return sqlite3.connect(DB_FILE)
+# def get_db():
+#     return sqlite3.connect(DB_FILE)
 
 
 
@@ -101,6 +101,7 @@ class Mon(msgspec.Struct):
     t_020:Optional[str] = None
     t_035:Optional[str] = None
     t_040:Optional[str] = None
+    t_041:Optional[str] = None
     t_100:Optional[str] = None
     t_130:Optional[str] = None
     t_245:Optional[str] = None
@@ -286,6 +287,7 @@ class QMO:
             result.append(record.get("020"))
             result.append(record.get("035"))
             result.append(record.get("040"))
+            result.append(record.get("041"))
             result.append(record.get("100"))
             result.append(record.get("130"))
             result.append(record.get("245"))
