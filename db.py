@@ -594,7 +594,10 @@ class QMO:
                 value = value.replace("||", f" OR {k} LIKE ")
                 value = value.replace("¬", f" AND {k} LIKE ")
                 value = value.replace("LIKE !", "NOT LIKE ")
-                value_splitted = value.split(" ", 1)
+                if value.find("NOT") >= 0:
+                    value_splitted = value[6:].split(" ", 1)
+                else:
+                    value_splitted = value.split(" ", 1)
                 for v in value_splitted:
                     if v.islower() and v not in self.available_fields or not v.isalnum() and v:
                         if v == "null":
