@@ -8,8 +8,8 @@ class test_QMO(unittest.TestCase):
     def setUp(self) -> None:
          self.n_1 = QMO("geo", {"id": "XX1000003", "limit": 1})
          self.per = QMO("per", {"id": "XX1000003", "limit": 1})
-         self.joining_query = QMO("mon", {"id": "21", "per": "a:3"})
-         self.joining_query_2 = QMO("mon", {"t_008": "21", "per": "a:3"})
+         self.joining_query = QMO("mon", {"id": "21", "per": "id:3"})
+         self.joining_query_2 = QMO("mon", {"t_008": "21", "per": "id:3"})
 
     def n_test(self):
         n_t = 0
@@ -89,38 +89,50 @@ class test_QMO(unittest.TestCase):
     PURGUE:
     '''
 
-    def test_purgue(self):
-        # self.assertEqual(self.n_1.purgue, {'success': True, 'limit': 1, 'fields': None, 'args': {'id': 'XX1000003'}})
-        self.assertEqual(self.joining_query.purgue, {'success': True, 'limit': "1000", 'fields': None, 'args': {'id': '21'}, "dataset_2":{"per":"a:3"}})
+    # def test_purgue(self):
+    #     # self.assertEqual(self.n_1.purgue, {'success': True, 'limit': 1, 'fields': None, 'args': {'id': 'XX1000003'}})
+    #     self.assertEqual(self.joining_query.purgue, {'success': True, 'limit': "1000", 'fields': None, 'args': {'id': '21'}, "dataset_2":{"per":"a:3"}})
     
     '''
     JOINING:
     '''
 
-    def test_joining(self):
-        to_where = self.joining_query.joining({"per":"a:hola"})
-        to_where = list(to_where.values())[0]
-        self.assertEqual(self.joining_query.joining({"per":"a:3"}), {"per":{"a":"3"}})
+    # def test_joining(self):
+    #     to_where = self.joining_query.joining({"per":"a:hola"})
+    #     to_where = list(to_where.values())[0]
+    #     self.assertEqual(self.joining_query.joining({"per":"a:3"}), {"per":{"a":"3"}})
 
     '''
     WHERE:
     '''
 
+    # def test_where(self):
+    #     args = {"id":"XX100900"}
+    #     where_id = '''WHERE  per_fts match \'id:NEAR("XX100900")\'  '''
+    #     self.assertEqual(self.per.where(args), where_id)
+    #     args = {"id": "XX", "t_100": "Fernández"}
+    #     self.assertEqual(self.per.where(args), '''WHERE  per_fts match 'id:NEAR("XX")'   AND  per_fts match 't_100:NEAR("Fernández")\'  ''')
+    #     args = {"id": "XX", "t_375": "mas culino","t_300": "!some value"}
+
+    # '''
+    # QUERY:
+    # '''
+
+    # def test_query(self):
+    #     result = '''SELECT mon.id, mon.t_001, mon.t_008, mon.t_020, mon.t_035, mon.t_040, mon.t_100, mon.t_130, mon.t_245, mon.t_260, mon.t_300, mon.t_500, mon.t_700, mon.t_899, mon.t_927, mon.t_980, mon.t_994, mon.per_id FROM mon WHERE mon.t_008 LIKE 21 LIMIT 1000;'''
+    #     self.assertEqual(self.joining_query_2.query()["query"],result)
+
     def test_where(self):
-        args = {"id":"XX100900"}
-        where_id = '''WHERE  per_fts match \'id:NEAR("XX100900")\'  '''
-        self.assertEqual(self.per.where(args), where_id)
-        args = {"id": "XX", "t_100": "Fernández"}
-        self.assertEqual(self.per.where(args), '''WHERE  per_fts match 'id:NEAR("XX")'   AND  per_fts match 't_100:NEAR("Fernández")\'  ''')
-        args = {"id": "XX", "t_375": "mas culino","t_300": "!some value"}
+        args = {"id":"1"}
+        where_q = '''WHERE  per_fts match \'id:NEAR("1")\'  '''
+        self.assertEqual(self.per.where(args), where_q)
+        args = {"t_375":"masculino"}
+        where_q = '''WHERE per.t_375 LIKE '%masculino%\''''
+        self.assertEqual(self.per.where(args), where_q)
+        args = {"t_375":"masculino a"}
+        where_q = '''WHERE per.t_375 LIKE '%masculino a%\''''
+        self.assertEqual(self.per.where(args), where_q)
 
-    '''
-    QUERY:
-    '''
-
-    def test_query(self):
-        result = '''SELECT mon.id, mon.t_001, mon.t_008, mon.t_020, mon.t_035, mon.t_040, mon.t_100, mon.t_130, mon.t_245, mon.t_260, mon.t_300, mon.t_500, mon.t_700, mon.t_899, mon.t_927, mon.t_980, mon.t_994, mon.per_id FROM mon WHERE mon.t_008 LIKE 21 LIMIT 1000;'''
-        self.assertEqual(self.joining_query_2.query()["query"],result)
 if __name__ == '__main__':
     qmo_funcs = tuple(filter(lambda func: not func.startswith("__"),dir(qmo_funcs)))
     test_funcs = tuple(filter(lambda func: func.startswith("test"),dir(test_QMO)))

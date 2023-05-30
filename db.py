@@ -6,7 +6,7 @@ from uuid import uuid4
 import msgspec
 from typing import Optional
 import datetime as dt
-import orjson as json
+# import orjson as json
 import time
 
 # def dict_factory(cursor, row):
@@ -101,6 +101,7 @@ class Mon(msgspec.Struct, omit_defaults=True):
     t_020:Optional[str] = None
     t_035:Optional[str] = None
     t_040:Optional[str] = None
+    t_041:Optional[str] = None
     t_100:Optional[str] = None
     t_130:Optional[str] = None
     t_245:Optional[str] = None
@@ -567,7 +568,7 @@ class QMO:
         args = dict(args)
         if not args:
             return ""
-        result = "WHERE "
+        result = "WHERE ("
         and_or = " AND "
         for k,value in args.items():
             '''
@@ -593,7 +594,7 @@ class QMO:
                 value = value.replace("||", f" OR {k} LIKE ")
                 value = value.replace("¬", f" AND {k} LIKE ")
                 value = value.replace("LIKE !", "NOT LIKE ")
-                value_splitted = value.split(" ")
+                value_splitted = value.split(" ", 1)
                 for v in value_splitted:
                     if v.islower() and v not in self.available_fields or not v.isalnum() and v:
                         if v == "null":
@@ -610,7 +611,7 @@ class QMO:
 
                 result += f"{k} {value}{and_or}"        
         result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
-        return result[0:-5]
+        return result[0:-5] + ")"
     
     def fts_add(self,args:list) -> str:
         result = ""
@@ -665,7 +666,7 @@ class QMO:
         res_json["success"] = True
         print(self.dataset)
         res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
-        res_json["query"] = query
+        # res_json["query"] = query
         # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
