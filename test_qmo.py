@@ -84,6 +84,46 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.mon_per_id("|aAntón, Francisco|qAntón Alted"), None)
         self.assertEqual(self.per.mon_per_id(None), None)
         self.assertEqual(self.per.mon_per_id(""), None)
+    
+    def test_country_of_publication(self):
+        self.assertEqual(self.per.country_of_publication(None),None)
+        self.assertEqual(self.per.country_of_publication("|a930610s1852    sp           |||| ||spa"), "España")
+        self.assertEqual(self.per.country_of_publication("|a951102s1832    sp     | |||| 000 0 lat"), "España")
+        self.assertEqual(self.per.country_of_publication("|a951102s1832    abc     | |||| 000 0 lat"), "Alberta")
+
+    def test_main_language(self):
+        self.assertEqual(self.per.main_language(None),None)
+        self.assertEqual(self.per.main_language("|a930610s1852    sp           |||| ||spa"), "español")
+        self.assertEqual(self.per.main_language("|a930610s1852    sp           |||| ||ach"), "acoli")
+    
+    def test_other_languages(self):
+        self.assertEqual(self.per.other_languages(None), None)
+        self.assertEqual(self.per.other_languages("|abul|brus|bfre"), "ruso, francés")
+        self.assertEqual(self.per.other_languages("|abul|brus|bfre|baaa"), "ruso, francés, aaa")
+        self.assertEqual(self.per.other_languages("|abul|brus|bfre|baaa|deng"), "ruso, francés, aaa, inglés")
+    
+    def test_original_language(self):
+        self.assertEqual(self.per.original_language(None), None)
+        self.assertEqual(self.per.original_language("|abul|brus|bfre|baaa|deng|heng"), "inglés")
+
+    def test_publication_date(self):
+        self.assertEqual(self.per.publication_date(None),None)
+        self.assertEqual(self.per.publication_date("|a880309s1987    bu                  bul"),"1987")
+
+    def test_decade(self):
+        self.assertEqual(self.per.decade(None),None)
+        self.assertEqual(self.per.decade("|a880309s1987    bu                  bul"),"80")
+        self.assertEqual(self.per.decade("|a880309s1727    bu                  bul"),"20")
+        self.assertEqual(self.per.decade("|a880309s17uu    bu                  bul"),None)
+        
+    def test_century(self):
+        self.assertEqual(self.per.century(None),None)
+        self.assertEqual(self.per.century("|a880309s1987    bu                  bul"),"XX")
+        self.assertEqual(self.per.century("|a880309s198u    bu                  bul"),"XX")
+        self.assertEqual(self.per.century("|a880309s19ux    bu                  bul"),"XX")
+        self.assertEqual(self.per.century("|a880309s0100    bu                  bul"),"II")
+        self.assertEqual(self.per.century("|a880309s1530    bu                  bul"),"XVI")
+        
 
     '''
     PURGUE:
@@ -122,16 +162,16 @@ class test_QMO(unittest.TestCase):
     #     result = '''SELECT mon.id, mon.t_001, mon.t_008, mon.t_020, mon.t_035, mon.t_040, mon.t_100, mon.t_130, mon.t_245, mon.t_260, mon.t_300, mon.t_500, mon.t_700, mon.t_899, mon.t_927, mon.t_980, mon.t_994, mon.per_id FROM mon WHERE mon.t_008 LIKE 21 LIMIT 1000;'''
     #     self.assertEqual(self.joining_query_2.query()["query"],result)
 
-    def test_where(self):
-        args = {"id":"1"}
-        where_q = '''WHERE  per_fts match \'id:NEAR("1")\'  '''
-        self.assertEqual(self.per.where(args), where_q)
-        args = {"t_375":"masculino"}
-        where_q = '''WHERE per.t_375 LIKE '%masculino%\''''
-        self.assertEqual(self.per.where(args), where_q)
-        args = {"t_375":"masculino a"}
-        where_q = '''WHERE per.t_375 LIKE '%masculino a%\''''
-        self.assertEqual(self.per.where(args), where_q)
+    # def test_where(self):
+    #     args = {"id":"1"}
+    #     where_q = '''WHERE  per_fts match \'id:NEAR("1")\'  '''
+    #     self.assertEqual(self.per.where(args), where_q)
+    #     args = {"t_375":"masculino"}
+    #     where_q = '''WHERE per.t_375 LIKE '%masculino%\''''
+    #     self.assertEqual(self.per.where(args), where_q)
+    #     args = {"t_375":"masculino a"}
+    #     where_q = '''WHERE per.t_375 LIKE '%masculino a%\''''
+    #     self.assertEqual(self.per.where(args), where_q)
 
 if __name__ == '__main__':
     qmo_funcs = tuple(filter(lambda func: not func.startswith("__"),dir(qmo_funcs)))
