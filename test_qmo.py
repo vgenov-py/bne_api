@@ -115,7 +115,7 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.decade("|a880309s1987    bu                  bul"),"80")
         self.assertEqual(self.per.decade("|a880309s1727    bu                  bul"),"20")
         self.assertEqual(self.per.decade("|a880309s17uu    bu                  bul"),None)
-        
+
     def test_century(self):
         self.assertEqual(self.per.century(None),None)
         self.assertEqual(self.per.century("|a880309s1987    bu                  bul"),"XX")
@@ -123,7 +123,46 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.century("|a880309s19ux    bu                  bul"),"XX")
         self.assertEqual(self.per.century("|a880309s0100    bu                  bul"),"II")
         self.assertEqual(self.per.century("|a880309s1530    bu                  bul"),"XVI")
-        
+
+    def test_legal_deposit(self):
+        self.assertEqual(self.per.legal_deposit(None), None)
+        self.assertEqual(self.per.legal_deposit("|aCR 1714-1986|bOficina Depósito Legal Ciudad Real"), "CR 1714-1986")
+        self.assertEqual(self.per.legal_deposit("|aCR 1714-1986|bOficina Depósito Legal Ciudad Real|aCRotronúmero"), "CR 1714-1986 /**/ CRotronúmero")
+
+    def test_isbn(self):
+        self.maxDiff = None
+        self.assertEqual(self.per.isbn("|a978-84-345-1144-6|qobra completa"), "978-84-345-1144-6 (obra completa)")    
+        self.assertEqual(self.per.isbn("|a978-84-345-1144-6|qobra completa /**/ |a988-84-345-1144-6|qobra incompleta"), "978-84-345-1144-6 (obra completa)  /**/ 988-84-345-1144-6 (obra incompleta)")    
+    
+    def test_mon_title(self):
+        self.assertEqual(self.per.mon_title(None),None)
+        self.assertEqual(self.per.mon_title("|aMérope|h[Texto impreso] :|btragedia en cinco actos de Alfieri|ctraducción de Juan Eugenio Harcenbusch"), "Mérope: tragedia en cinco actos de Alfieri.")
+        self.assertEqual(self.per.mon_title("|aMérope|h[Texto impreso] :|btragedia en cinco actos de Alfieri|ctraducción de Juan Eugenio Harcenbusch|nDollarN|pDollarP"), "Mérope: tragedia en cinco actos de Alfieri. DollarN, DollarP")
+
+    def test_mon_other_titles(self):
+        self.assertEqual(self.per.mon_other_titles("|iII|aAA|bBB|nNN|pPP", None), "II: AA: BB. NN, PP")
+        self.assertEqual(self.per.mon_other_titles("|iII|aAA|bBB|nNN|pPP", "|aAAA"), "II: AA: BB. NN, PP /**/ AAA")
+    
+    def test_edition(self):
+        self.assertEqual(self.per.mon_edition("|aAA|bBB"), "AA, BB")
+        self.assertEqual(self.per.mon_edition("|aAA"), "AA")
+
+    def test_mon_publication_place(self):
+        self.assertEqual(self.per.mon_publication_place("|aAA", None), "AA")
+        self.assertEqual(self.per.mon_publication_place(None, "|aAA"), "AA")
+
+    def test_mon_serie(self):
+        self.assertEqual(self.per.mon_serie("|aAA|vVV", None), "AAVV")
+        self.assertEqual(self.per.mon_serie(None, "|aAA|vVV"), "AAVV")
+        self.assertEqual(self.per.mon_serie("|aXX|vYY","|aAA|vVV"), "XXYY /**/ AAVV")
+    
+    def test_mon_notes(self):
+        self.assertEqual(self.per.mon_notes({"500":"|aAA", "594": "|a594", "563": None}), "AA /**/ 594")
+        self.assertEqual(self.per.mon_notes({}), None)
+    
+    def test_mon_subject(self):
+        self.assertEqual(self.per.mon_subject({"600": "|a[S.l.]|b[s.n.]|cimp. 1832|eVich|fpor Ignacio Valls, imp.|2XX|1|3|4|5|6|7|8|9|10"}, ("600", "610", "611", "630", "650", "651", "653")), "[S.l.] - [s.n.] - imp. 1832 - Vich - por Ignacio Valls, imp. - 0")
+        self.assertEqual(self.per.mon_subject({"600": "|a[S.l.]|b[s.n.]|cimp. 1832|eVich|fpor Ignacio Valls, imp.|2XX|1|3|4|5|6|7|8|9|10", "610":"|2A"}, ("600", "610", "611", "630", "650", "651", "653")), "[S.l.] - [s.n.] - imp. 1832 - Vich - por Ignacio Valls, imp. - 0")
 
     '''
     PURGUE:
@@ -146,14 +185,18 @@ class test_QMO(unittest.TestCase):
     WHERE:
     '''
 
-    # def test_where(self):
-    #     args = {"id":"XX100900"}
-    #     where_id = '''WHERE  per_fts match \'id:NEAR("XX100900")\'  '''
-    #     self.assertEqual(self.per.where(args), where_id)
-    #     args = {"id": "XX", "t_100": "Fernández"}
-    #     self.assertEqual(self.per.where(args), '''WHERE  per_fts match 'id:NEAR("XX")'   AND  per_fts match 't_100:NEAR("Fernández")\'  ''')
-    #     args = {"id": "XX", "t_375": "mas culino","t_300": "!some value"}
-
+    def test_where(self):
+        args = {"id":"XX100900"}
+        where_id = '''WHERE ( per_fts match \'id:NEAR("XX100900")\'  )'''
+        self.assertEqual(self.per.where(args), where_id)
+        args = {"id": "XX", "t_100": "Fernández"}
+        self.assertEqual(self.per.where(args), '''WHERE ( per_fts match 'id:NEAR("XX")'   AND  per_fts match 't_100:NEAR("Fernández")\'  )''')
+        args = {"t_375": "masculino||femenino"}
+        self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%')''')
+        args = {"t_375": "masculino||femenino", "t_670": "Out of"}
+        self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%' AND per.t_670 LIKE '|%out of%')''')
+        args = {"t_375": "masculino||femenino", "t_670": "Out of||AA"}
+        self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%' AND per.t_670 LIKE '|%out of%' OR per.t_670 LIKE '|%aa%')''')
     # '''
     # QUERY:
     # '''

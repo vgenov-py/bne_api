@@ -84,30 +84,6 @@ per_fts = '''
 insert into per_fts (id,t_100,t_372,t_374,t_400,nombre_de_persona,campo_actividad,ocupacion,otros_nombres) select id,t_100,t_372,t_374,t_400,nombre_de_persona,campo_actividad,ocupacion,otros_nombres from per;
 '''
 
-query_create_mon = f'''
-    CREATE TABLE mon (
-    id TEXT PRIMARY KEY,
-    t_001 TEXT,
-    t_008 TEXT,
-    t_017 TEXT,
-    t_020 TEXT,
-    t_035 TEXT,
-    t_040 TEXT,
-    t_100 TEXT,
-    t_130 TEXT,
-    t_245 TEXT,
-    t_260 TEXT,
-    t_300 TEXT,
-    t_500 TEXT,
-    t_700 TEXT,
-    t_899 TEXT,
-    t_927 TEXT,
-    t_980 TEXT,
-    t_994 TEXT,
-    per_id TEXT
-    );
-'''
-
 new_mon = f'''
     CREATE TABLE mon (
     id TEXT PRIMARY KEY,
