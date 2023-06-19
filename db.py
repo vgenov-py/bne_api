@@ -213,7 +213,7 @@ class QMO:
         for field in self.cur.execute(f"pragma table_info({self.dataset});"):
             field:str = field[1]
             if field.startswith("t_"):
-                result += f", {field}"
+                result += f", {self.dataset}.{field}"
             else:
                 result += f", NULL"
         return result[2:]
@@ -224,7 +224,7 @@ class QMO:
         for field in self.cur.execute(f"pragma table_info({self.dataset});"):
             field:str = field[1]
             if not field.startswith("t_"):
-                result += f", {field}"
+                result += f", {self.dataset}.{field}"
             else:
                 result += f", NULL"
         return result[2:]
