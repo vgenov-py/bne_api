@@ -767,9 +767,6 @@ class QMO:
         if value_700:
             return f"{value_100} /**/ {value_700}"
         return value_100
-        
-
-
 
     def mon_title(self, value:str) -> str:
         '''245: Mención de autores |a:|b.|n,|p'''
@@ -1000,9 +997,11 @@ class QMO:
             '''
             VIRTUAL START
             '''
-            if k in self.virtual_fields:
+            if k in self.virtual_fields and value.find("null") == -1:
+                print(value.find("null"))
                 v = re.sub("\|\||¬|!", "", value)
                 v_where = f''' {self.dataset}_fts match '{k}:NEAR("{v}")'  {and_or}'''
+                print(f"XXX {value}")
                 result += v_where
             else:
                 k = f"{dataset}.{k}"
