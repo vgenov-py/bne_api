@@ -751,19 +751,19 @@ class QMO:
             r+= f"{d_a} {self.splitter}"
         return r[:-7]
 
-    def mon_authors(self, value_100:str, value_700:str):
+    def mon_authors(self, value_100:str, value_700:str) -> str:
         if not value_100:
             return
         
-        value_100 = self.per_person_name(value_100)
         value_100_e = self.get_single_dollar(value_100, "e")
+        value_100 = self.per_person_name(value_100)
         if value_100_e:
             value_100 = f"{value_100}({value_100_e})"
         if value_700:
+            value_700_e = self.get_single_dollar(value_700, "e")
             value_700 = self.per_person_name(value_700)
-        value_700_e = self.get_single_dollar(value_700, "e")
-        if value_700_e:
-            value_700 = f"{value_100}({value_700_e})"
+            if value_700_e:
+                value_700 = f"{value_700}({value_700_e})"
         if value_700:
             return f"{value_100} /**/ {value_700}"
         return value_100

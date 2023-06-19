@@ -167,7 +167,7 @@ class test_QMO(unittest.TestCase):
     def test_mon_authors(self):
         self.assertEqual(self.per.mon_authors(None, "700"), None)
         self.assertEqual(self.per.mon_authors("|aCervantes Saavedra, Miguel de|d1547-1616|0XX1718747", None), "Cervantes Saavedra, Miguel de, (1547-1616)")
-        self.assertEqual(self.per.mon_authors("|aCervantes Saavedra, Miguel de|d1547-1616|0XX1718747", "|aJarvis, Charles|d1675?-1739|0http://datos.bne.es/resource/XX979939"), "Cervantes Saavedra, Miguel de, (1547-1616) /**/ Jarvis, Charles, (1675?-1739)")
+        self.assertEqual(self.per.mon_authors("|aCervantes Saavedra, Miguel de|d1547-1616|0XX1718747", "|aJarvis, Charles|d1675?-1739|0http://datos.bne.es/resource/XX979939|eXX"), "Cervantes Saavedra, Miguel de, (1547-1616) /**/ Jarvis, Charles, (1675?-1739)(XX)")
 
     '''
     PURGUE:
