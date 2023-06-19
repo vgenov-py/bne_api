@@ -115,6 +115,8 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.decade("|a880309s1987    bu                  bul"),"80")
         self.assertEqual(self.per.decade("|a880309s1727    bu                  bul"),"20")
         self.assertEqual(self.per.decade("|a880309s17uu    bu                  bul"),None)
+        self.assertEqual(self.per.decade("|a990501s19uu    sp                  spa"),None)
+        
 
     def test_century(self):
         self.assertEqual(self.per.century(None),None)
