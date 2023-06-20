@@ -6,6 +6,7 @@ import cProfile
 import pstats
 import msgspec
 import orjson as json
+from qargs import Qargs
 api = Blueprint("api", __name__)
 '''
 
@@ -87,6 +88,13 @@ def r_test():
     print(delta)
     print(time.perf_counter() - start )
     return res
+
+@api.route("/qargs")
+def r_qargs():
+    data_purgue = QMO("per")
+    print(data_purgue.purgue)
+    test_1 = Qargs()
+    return "test_1.query"
 
 
 
