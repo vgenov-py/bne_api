@@ -9,7 +9,6 @@ class Qargs:
     '''
     Qargs (Query from args)
     This object will create a valid sqlite3 SELECT query based on args supplied\n
-    args have to be previously curated\n
     args can contain one or more of the followings:\n
     table:str
     fields:[[]str]|None
@@ -19,16 +18,15 @@ class Qargs:
     '''
     def __init__(self,model:str, args:dict) -> None:
         self.model = model
-        self.pre_args = args
+        self.args = args
 
     @property
     def cur(self) -> sqlite3.Connection:
-        return sqlite3.connect(DB_FILE)
+        return sqlite3.connect(DB_FILE).cursor()
     
-    @property
-    def args(self) -> dict:
+    def clean_args(self, pre:dict) -> dict:
         r = {}
-        pre_args = self.pre_args.copy()
+        pre_args = self.args.copy()
         r["table"] = self.model
         r["limit"] = pre_args.pop("limit", "1000")
         r["fields"] = pre_args.pop("fields", None)

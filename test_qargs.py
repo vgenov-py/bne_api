@@ -1,15 +1,15 @@
 import unittest
 from qargs import Qargs
-from sqlite3 import Connection
+from sqlite3 import Cursor
 
 class test_Qargs(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.empty = Qargs({})
-        self.table = Qargs({"table":"per"})
-        self.table_limit = Qargs({"table":"per", "limit":1000})
-        self.table_fields = Qargs({"table": "per", "fields":"id,t_001,t_003"})
-        self.table_filters = Qargs({"table": "per", "filters": {"id": "XX123000", "t_001":"XX123000"}})
+        self.empty = Qargs("per",{})
+        self.table = Qargs("per",{"table":"per"})
+        self.table_limit = Qargs("per",{"table":"per", "limit":1000})
+        self.table_fields = Qargs("per",{"table": "per", "fields":"id,t_001,t_003"})
+        self.table_filters = Qargs("per",{"table": "per", "filters": {"id": "XX123000", "t_001":"XX123000"}})
     
     def tearDown(self) -> None:
         pass
@@ -18,7 +18,14 @@ class test_Qargs(unittest.TestCase):
     Connection:
     '''
     def test_db(self):
-        self.assertEqual(type(self.empty.cur), Connection)
+        self.assertEqual(type(self.empty.cur), Cursor)
+
+    '''
+    clean_args()
+    '''
+    def test_clean_args(self):
+        pass
+        # self.assertEqual(self.empty.clean_args({"table":"per"}),"")
     '''
     Table:
     '''
