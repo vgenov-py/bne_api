@@ -1001,12 +1001,12 @@ class QMO:
             '''
             VIRTUAL START
             '''
-            if True:
-            # if k in self.virtual_fields and value.find("null") == -1:
+            # if True:
+            if k in self.virtual_fields and value.find("null") == -1:
                 # v = re.sub("\|\||¬|!", "", value)
                 v = value.replace("||", " OR ")
                 # v_where = f''' {self.dataset} match '{k}:NEAR("{v}*")'  {and_or}'''
-                v_where = f''' {self.dataset}.{k} match '{v}*'  {and_or}'''
+                v_where = f''' {self.dataset}_fts.{k} match '{v}*'  {and_or}'''
                 result += v_where
             else:
                 k = f"{dataset}.{k}"
@@ -1095,7 +1095,7 @@ class QMO:
             query += joining_where
         else:
             query += self.where(res_json["args"].items())
-        query += f"ORDER BY rank LIMIT {res_json['limit']};" 
+        query += f" ORDER BY rank LIMIT {res_json['limit']};" 
         print(f"\n{query}\n".center(50 + len(query),"#"))
         with open("logs/query.log", mode="r+", encoding="utf-8") as file:
             if len(file.readlines()) <= 10:

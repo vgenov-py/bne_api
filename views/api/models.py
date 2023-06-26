@@ -28,35 +28,6 @@ query_create_geo = f'''
     );
 '''
 
-query_create_geo = f'''
-    CREATE TABLE geo (
-        id TEXT PRIMARY KEY,
-        t_001 TEXT COLLATE NOCASE,
-        t_024 TEXT COLLATE NOCASE,
-        t_034 TEXT COLLATE NOCASE,
-        t_080 TEXT COLLATE NOCASE,
-        t_151 TEXT COLLATE NOCASE,
-        t_451 TEXT COLLATE NOCASE,
-        t_510 TEXT COLLATE NOCASE,
-        t_550 TEXT COLLATE NOCASE,
-        t_551 TEXT COLLATE NOCASE,
-        t_667 TEXT COLLATE NOCASE,
-        t_670 TEXT COLLATE NOCASE,
-        t_781 TEXT COLLATE NOCASE,
-        otros_identificadores TEXT COLLATE NOCASE,
-        coordenadas_lat_lng TEXT COLLATE NOCASE,
-        CDU TEXT COLLATE NOCASE,
-        nombre_de_lugar TEXT COLLATE NOCASE,
-        otros_nombres_de_lugar TEXT COLLATE NOCASE,
-        entidad_relacionada TEXT COLLATE NOCASE,
-        materia_relacionada TEXT COLLATE NOCASE,
-        lugar_relacionado TEXT COLLATE NOCASE,
-        nota_general TEXT COLLATE NOCASE,
-        fuentes_de_informacion TEXT COLLATE NOCASE,
-        lugar_jerarquico TEXT COLLATE NOCASE,
-        obras_relacionadas_en_el_catalogo_BNE TEXT COLLATE NOCASE
-    );
-'''
 
 query_create_per_human = f'''
     CREATE TABLE per (
@@ -95,46 +66,6 @@ query_create_per_human = f'''
     persona_relacionada TEXT,
     fuentes_de_informacion TEXT,
     obras_relacionadas_en_el_catalogo_BNE TEXT
-    );
-'''
-
-query_create_per_human = f'''
-    CREATE TABLE per (
-    id TEXT PRIMARY KEY,
-    t_001 TEXT COLLATE NOCASE,
-    t_024 TEXT COLLATE NOCASE,
-    t_046 TEXT COLLATE NOCASE,
-    t_100 TEXT COLLATE NOCASE,
-    t_368 TEXT COLLATE NOCASE,
-    t_370 TEXT COLLATE NOCASE,
-    t_372 TEXT COLLATE NOCASE,
-    t_373 TEXT COLLATE NOCASE,
-    t_374 TEXT COLLATE NOCASE,
-    t_375 TEXT COLLATE NOCASE,
-    t_377 TEXT COLLATE NOCASE,
-    t_400 TEXT COLLATE NOCASE,
-    t_500 TEXT COLLATE NOCASE,
-    t_510 TEXT COLLATE NOCASE,
-    t_670 TEXT COLLATE NOCASE,
-    otros_identificadores TEXT COLLATE NOCASE,
-    fecha_nacimiento TEXT COLLATE NOCASE,
-    fecha_muerte TEXT COLLATE NOCASE,
-    nombre_de_persona TEXT COLLATE NOCASE,
-    otros_atributos_persona TEXT COLLATE NOCASE,
-    lugar_nacimiento TEXT COLLATE NOCASE,
-    lugar_muerte TEXT COLLATE NOCASE,
-    pais_relacionado TEXT COLLATE NOCASE,
-    otros_lugares_relacionados TEXT COLLATE NOCASE,
-    lugar_residencia TEXT COLLATE NOCASE,
-    campo_actividad TEXT COLLATE NOCASE,
-    grupo_o_entidad_relacionada TEXT COLLATE NOCASE,
-    ocupacion TEXT COLLATE NOCASE,
-    genero TEXT COLLATE NOCASE,
-    lengua TEXT COLLATE NOCASE,
-    otros_nombres TEXT COLLATE NOCASE,
-    persona_relacionada TEXT COLLATE NOCASE,
-    fuentes_de_informacion TEXT COLLATE NOCASE,
-    obras_relacionadas_en_el_catalogo_BNE TEXT COLLATE NOCASE
     );
 '''
 
