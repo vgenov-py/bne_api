@@ -2,6 +2,7 @@ from flask import Blueprint,  request, render_template, make_response, Response
 from db import QMO
 import sqlite3
 import time
+import datetime as dt
 import cProfile
 import pstats
 import msgspec
@@ -26,21 +27,23 @@ def r_home():
 @api.route("/<model>")
 def r_query(model):
     s = time.perf_counter()
-    test_QMO = QMO(model, request.args)
     # with cProfile.Profile() as pr: # http://localhost:3000/api/per?t_375=masculino&limit=1000000
+    print(dt.datetime.now())
+    test_QMO = QMO(model, request.args)
+    print("QMO: ",dt.datetime.now())
     data = test_QMO.query()
 
     if data["success"]:
         data["length"] = 0
+
         data["data"] = tuple(data["data"])
+        print("data - TUPLE: ",dt.datetime.now())
         data["time"] = time.perf_counter() - s
         data["length"] += len(data["data"])
+        print("TIME: ",data["time"])
+        print(data["length"])
     data = msgspec.json.encode(data)
-    # data = json.dumps(data)
     res = Response(response=data, mimetype="application/json", status=200)
-    # stats = pstats.Stats(pr)
-    # stats.sort_stats(pstats.SortKey.TIME)
-    # stats.print_stats()
     return res
 
 @api.route("/entry/<model>")
