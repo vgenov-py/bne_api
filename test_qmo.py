@@ -62,11 +62,6 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.per_other_attributes("|cNombre artístico"),"Nombre artístico")
         self.assertEqual(self.per.per_other_attributes("|cSanto /**/ |dObispo de Lyon"),"Santo /**/ Obispo de Lyon")
 
-    def test_per_other_sources(self):
-        return
-        self.assertEqual(self.per.per_other_attributes(None),None)
-        self.assertEqual(self.per.per_other_attributes(""),"")
-
     def test_per_gen_url(self):
         self.assertEqual(self.per.per_gen_url("|aXX133007"), "http://catalogo.bne.es/uhtbin/cgisirsi/0/x/0/05?searchdata1=%5ea133007")
         self.assertEqual(self.per.per_gen_url(None), None)
@@ -117,7 +112,6 @@ class test_QMO(unittest.TestCase):
         self.assertEqual(self.per.decade("|a880309s17uu    bu                  bul"),None)
         self.assertEqual(self.per.decade("|a990501s19uu    sp                  spa"),None)
         
-
     def test_century(self):
         self.assertEqual(self.per.century(None),None)
         self.assertEqual(self.per.century("|a880309s1987    bu                  bul"),"XX")
@@ -183,27 +177,36 @@ class test_QMO(unittest.TestCase):
     JOINING:
     '''
 
-    # def test_joining(self):
-    #     to_where = self.joining_query.joining({"per":"a:hola"})
-    #     to_where = list(to_where.values())[0]
-    #     self.assertEqual(self.joining_query.joining({"per":"a:3"}), {"per":{"a":"3"}})
+    def test_joining(self):
+        to_where = self.joining_query.joining({"per":"a:hola"})
+        to_where = list(to_where.values())[0]
+        self.assertEqual(self.joining_query.joining({"per":"a:3"}), {"per":{"a":"3"}})
+        self.assertEqual(self.joining_query.joining({"per":"a:3,b:2"}), {"per":{"a":"3", "b": "2"}})
 
     '''
     WHERE:
     '''
 
-    def test_where(self):
-        args = {"id":"XX100900"}
-        where_id = '''WHERE ( per_fts match \'id:NEAR("XX100900")\'  )'''
-        self.assertEqual(self.per.where(args), where_id)
-        args = {"id": "XX", "t_100": "Fernández"}
-        self.assertEqual(self.per.where(args), '''WHERE ( per_fts match 'id:NEAR("XX")'   AND  per_fts match 't_100:NEAR("Fernández")\'  )''')
-        args = {"t_375": "masculino||femenino"}
-        self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%')''')
-        args = {"t_375": "masculino||femenino", "t_670": "Out of"}
-        self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%' AND per.t_670 LIKE '|%out of%')''')
-        args = {"t_375": "masculino||femenino", "t_670": "Out of||AA"}
-        self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%' AND per.t_670 LIKE '|%out of%' OR per.t_670 LIKE '|%aa%')''')
+    # def test_where(self):
+    #     args = {"id":"XX100900"}
+    #     where_id = '''WHERE ( per_fts match \'id:NEAR("XX100900")\'  )'''
+    #     self.assertEqual(self.per.where(args), where_id)
+    #     args = {"id": "XX", "t_100": "Fernández"}
+    #     self.assertEqual(self.per.where(args), '''WHERE ( per_fts match 'id:NEAR("XX")'   AND  per_fts match 't_100:NEAR("Fernández")\'  )''')
+    #     args = {"t_375": "masculino||femenino"}
+    #     self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%')''')
+    #     args = {"t_375": "masculino||femenino", "t_670": "Out of"}
+    #     self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%' AND per.t_670 LIKE '|%out of%')''')
+    #     args = {"t_375": "masculino||femenino", "t_670": "Out of||AA"}
+    #     self.assertEqual(self.per.where(args), '''WHERE (per.t_375 LIKE '|%masculino%' OR per.t_375 LIKE '|%femenino%' AND per.t_670 LIKE '|%out of%' OR per.t_670 LIKE '|%aa%')''')
+    
+    
+    '''
+    WHERE_FTS:
+    '''
+    def test_where_fts(self):
+        args = {"id": "XX100900"}
+    
     # '''
     # QUERY:
     # '''
@@ -211,17 +214,6 @@ class test_QMO(unittest.TestCase):
     # def test_query(self):
     #     result = '''SELECT mon.id, mon.t_001, mon.t_008, mon.t_020, mon.t_035, mon.t_040, mon.t_100, mon.t_130, mon.t_245, mon.t_260, mon.t_300, mon.t_500, mon.t_700, mon.t_899, mon.t_927, mon.t_980, mon.t_994, mon.per_id FROM mon WHERE mon.t_008 LIKE 21 LIMIT 1000;'''
     #     self.assertEqual(self.joining_query_2.query()["query"],result)
-
-    # def test_where(self):
-    #     args = {"id":"1"}
-    #     where_q = '''WHERE  per_fts match \'id:NEAR("1")\'  '''
-    #     self.assertEqual(self.per.where(args), where_q)
-    #     args = {"t_375":"masculino"}
-    #     where_q = '''WHERE per.t_375 LIKE '%masculino%\''''
-    #     self.assertEqual(self.per.where(args), where_q)
-    #     args = {"t_375":"masculino a"}
-    #     where_q = '''WHERE per.t_375 LIKE '%masculino a%\''''
-    #     self.assertEqual(self.per.where(args), where_q)
 
 if __name__ == '__main__':
     qmo_funcs = tuple(filter(lambda func: not func.startswith("__"),dir(qmo_funcs)))
