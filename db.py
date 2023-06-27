@@ -6,7 +6,7 @@ from uuid import uuid4
 import msgspec
 from typing import Optional
 import datetime as dt
-import orjson as json
+# import orjson as json
 import time
 
 # def dict_factory(cursor, row):
@@ -961,7 +961,7 @@ class QMO:
             result = ""
             for field in self.available_fields:
                 if field in fields.split(","):
-                    result += f",{self.dataset}.{field}"
+                    result += f",{self.dataset}_fts.{field}"
                 else:
                     result += f",NULL"
             res_json["fields"] = result[1:]
@@ -1054,24 +1054,29 @@ class QMO:
     
     def where_fts(self, args: dict) -> str:
         args = dict(args)
+        print(args)
         if not args:
             return ""
-        result = "WHERE ("
+        result = f"WHERE {self.dataset}_fts MATCH "
         and_or = " AND "
         for k,value in args.items():
-            '''
-            VIRTUAL START
-            '''
-            if True:
-            # if k in self.virtual_fields and value.find("null") == -1 and dataset == self.dataset:
-                # v = re.sub("\|\||¬|!", "", value)
+            if value.strip() == "null":
+                v_where = f''''t_001: a *' AND {k} IS NULL {and_or}'''
+            elif value.strip() == "!null":
+                v_where = f''''t_001: a *' AND {k} IS NOT NULL {and_or}'''
+            elif value.find("!") >= 0:
+                v = value.replace("!", "")
+                result += "'t_001: a * NOT "
+                v_where = f'''{k}: {v}*' {and_or}'''
+            elif value.find("||") >= 0:
                 v = value.replace("||", "* OR ")
-                # v_where = f''' {self.dataset} match '{k}:NEAR("{v}*")'  {and_or}'''
-                v_where = f''' {self.dataset}_fts.{k} match '{v}*'  {and_or}'''
-                result += v_where
+                v_where = f''''{k}: {v}*' {and_or}'''
+            else:
+                v_where = f''''{k}: {value}*' {and_or}'''
 
-        result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
-        return result[0:-5] + ")"
+            result += v_where
+        # result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
+        return result[:-5]
     
     def fts_add(self,args:list) -> str:
         result = ""
@@ -1098,12 +1103,13 @@ class QMO:
         
         all_fields=""
         for field in self.available_fields:
-            all_fields += f"{self.dataset}.{field}, "
+            all_fields += f"{self.dataset}_fts.{field}, "
         fields = res_json['fields'] if res_json['fields'] else all_fields[0:-2] #TODO: put all fields after and make always the conversion to -> dataset.field
         if not fields:
             fields = " * "
-        query = f"SELECT {fields} FROM {self.dataset} "
-        query += self.fts_add(res_json["args"].keys())
+        print(fields)
+        query = f"SELECT {fields} FROM {self.dataset}_fts "
+        # query += self.fts_add(res_json["args"].keys())
         if res_json.get("dataset_2"):
             print("ON JOINING")
             joining_dict = self.joining(res_json["dataset_2"])
@@ -1114,7 +1120,8 @@ class QMO:
             joining_where = joining_where.replace("WHERE", f"INNER JOIN per ON per.id = mon.per_id WHERE ")
             query += joining_where
         else:
-            query += self.where(res_json["args"].items())
+            # query += self.where(res_json["args"].items())
+            query += self.where_fts(res_json["args"].items())
         query += f" ORDER BY rank LIMIT {res_json['limit']};" 
         print(f"\n{query}\n".center(50 + len(query),"#"))
         with open("logs/query.log", mode="r+", encoding="utf-8") as file:

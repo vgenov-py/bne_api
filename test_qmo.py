@@ -206,6 +206,16 @@ class test_QMO(unittest.TestCase):
     '''
     def test_where_fts(self):
         args = {"id": "XX100900"}
+        self.assertEqual(self.per.where_fts(args),"WHERE per_fts MATCH 'id: XX100900*' ")
+        args = {"id": "XX100900", "t_100": "Genovese"}
+        self.assertEqual(self.per.where_fts(args),"WHERE per_fts MATCH 'id: XX100900*'  AND 't_100: Genovese*' ")
+        args = {"t_100": "Genovese||Berjano"}
+        self.assertEqual(self.per.where_fts(args),"WHERE per_fts MATCH 't_100: Genovese* OR Berjano*' ")
+        args = {"t_100": "Genovese||Berjano||Gorzinski", "id": "XX1010"}
+        self.assertEqual(self.per.where_fts(args),"WHERE per_fts MATCH 't_100: Genovese* OR Berjano* OR Gorzinski*'  AND 'id: XX1010*' ")
+        args = {"id": "!XX100900"}
+        self.assertEqual(self.per.where_fts(args),"WHERE per_fts MATCH 't_001: a * NOT id: XX100900*' ")
+        
     
     # '''
     # QUERY:
