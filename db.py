@@ -215,7 +215,7 @@ class QMO:
         for field in self.cur.execute(f"pragma table_info({self.dataset});"):
             field:str = field[1]
             if field.startswith("t_"):
-                result += f", {self.dataset}.{field}"
+                result += f", {self.dataset}_fts.{field}"
             else:
                 result += f", NULL"
         return result[2:]
@@ -226,7 +226,7 @@ class QMO:
         for field in self.cur.execute(f"pragma table_info({self.dataset});"):
             field:str = field[1]
             if not field.startswith("t_"):
-                result += f", {self.dataset}.{field}"
+                result += f", {self.dataset}_fts.{field}"
             else:
                 result += f", NULL"
         return result[2:]
@@ -1068,6 +1068,8 @@ class QMO:
             elif v.find("!") >= 0:
                 v_where = f'''{dataset}_fts.{k} NOT LIKE '%{v}%'{and_or}'''
                 v_where = v_where.replace("!", "")
+            elif k == "all":
+                v_where = f'''{dataset}_fts MATCH '{v}*'{and_or}'''
             else:
                 if v.find("||") >= 0:
                     v = v.replace("||", "* OR ")
@@ -1103,28 +1105,28 @@ class QMO:
         all_fields=""
         for field in self.available_fields:
             all_fields += f"{self.dataset}_fts.{field}, "
-        fields = res_json['fields'] if res_json['fields'] else all_fields[0:-2] #TODO: put all fields after and make always the conversion to -> dataset.field
+        fields = res_json['fields'] if res_json['fields'] else all_fields[0:-2]
         if not fields:
             fields = " * "
-        print(fields)
+        else:
+            for field in fields.split(" "):
+                if field.find("NULL") >= 0:
+                    # print(f"{field}_fts")
+                    pass
+        # print(fields)
         query = f"SELECT {fields} FROM {self.dataset}_fts "
-        # query += self.fts_add(res_json["args"].keys())
         if res_json.get("dataset_2"):
             query = query.replace("_fts", "")
             print("ON JOINING")
             joining_dict = self.joining(res_json["dataset_2"])
-            # joining_where = self.where(joining_dict["per"], "per")
             joining_where = self.where_fts(joining_dict["per"], "per")
-            print(joining_where, "XX")
-            where = self.where(res_json["args"].items())
+            where_dataset = self.where(res_json["args"].items())
+            where_dataset = where_dataset.replace("WHERE", " AND ")
             joining_where = joining_where.replace("WHERE", f"INNER JOIN per_fts ON per_fts.id = mon.per_id  WHERE ")
-            print(joining_where, "YY")
-            # joining_where = where.replace("WHERE", f"{joining_where} AND ")
-            print(joining_where, "DD")
-
+            if where_dataset:
+                joining_where += where_dataset
             query += joining_where
         else:
-            # query += self.where(res_json["args"].items())
             query += self.where_fts(res_json["args"].items())
         query += f" LIMIT {res_json['limit']};" 
         print(f"\n{query}\n".center(50 + len(query),"#"))
@@ -1144,10 +1146,7 @@ class QMO:
             return res
         res_json = self.res_json
         res_json["success"] = True
-        print(self.dataset)
         res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
-        # res_json["query"] = query
-        # res_json["data"] = map(lambda row:dict(zip(a_f,row)),res)
         return res_json
     
     def blunt_query(self):
