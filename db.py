@@ -1002,53 +1002,53 @@ class QMO:
             '''
             VIRTUAL START
             '''
-            if True:
+            # if True:
             # if k in self.virtual_fields and value.find("null") == -1 and dataset == self.dataset:
                 # v = re.sub("\|\||¬|!", "", value)
-                v = value.replace("||", "* OR ")
-                # v_where = f''' {self.dataset} match '{k}:NEAR("{v}*")'  {and_or}'''
-                v_where = f''' {self.dataset}_fts.{k} match '{v}*'  {and_or}'''
-                result += v_where
+                # v = value.replace("||", "* OR ")
+                # # v_where = f''' {self.dataset} match '{k}:NEAR("{v}*")'  {and_or}'''
+                # v_where = f''' {self.dataset}_fts.{k} match '{v}*'  {and_or}'''
+                # result += v_where
+        # else:
+            k = f"{dataset}.{k}"
+            value: str = value.lower()
+            if value[-2:] == "||":
+                and_or = " OR  "
+                value = value[0:-2]
             else:
-                k = f"{dataset}.{k}"
-                value: str = value.lower()
-                if value[-2:] == "||":
-                    and_or = " OR  "
-                    value = value[0:-2]
-                else:
-                    and_or = " AND "
-                if value[0] == "!":
-                    value = value.replace("!", "NOT LIKE ", 1)
-                else:
-                    value = f"LIKE {value}"
-                
-                value = value.replace("||", f" OR {k} LIKE ")
-                value = value.replace("¬", f" AND {k} LIKE ")
-                value = value.replace("LIKE !", "NOT LIKE ")
-                if value.find("NOT") >= 0:
-                    value_splitted = value[6:].split(" ", 1)
-                elif value.find("OR") >= 0:
-                    value_splitted = value.split(" ")
-                else:
-                    value_splitted = value.split(" ", 1)
-                for v in value_splitted:
-                    if v.islower() and v not in self.available_fields or not v.isalnum() and v:
-                        if v == "null":
-                            value = value.replace(v, "NULL")
-                            if value.find("NOT LIKE NULL") >= 0:
-                                value = value.replace("NOT LIKE NULL", "IS NOT NULL")
-                            elif value.find("LIKE NULL") >= 0:
-                                value = value.replace("LIKE NULL", "IS NULL")
+                and_or = " AND "
+            if value[0] == "!":
+                value = value.replace("!", "NOT LIKE ", 1)
+            else:
+                value = f"LIKE {value}"
+            
+            value = value.replace("||", f" OR {k} LIKE ")
+            value = value.replace("¬", f" AND {k} LIKE ")
+            value = value.replace("LIKE !", "NOT LIKE ")
+            if value.find("NOT") >= 0:
+                value_splitted = value[6:].split(" ", 1)
+            elif value.find("OR") >= 0:
+                value_splitted = value.split(" ")
+            else:
+                value_splitted = value.split(" ", 1)
+            for v in value_splitted:
+                if v.islower() and v not in self.available_fields or not v.isalnum() and v:
+                    if v == "null":
+                        value = value.replace(v, "NULL")
+                        if value.find("NOT LIKE NULL") >= 0:
+                            value = value.replace("NOT LIKE NULL", "IS NOT NULL")
+                        elif value.find("LIKE NULL") >= 0:
+                            value = value.replace("LIKE NULL", "IS NULL")
+                    else:
+                        if k.find("t_") >= 0:
+                            if not v.startswith(f"{self.dataset}."):
+                                value = value.replace(v, f"'|%{v}%'")
+                        elif k.find("siglo") >= 0:
+                            value = value.replace(v, f"'{v}'")
                         else:
-                            if k.find("t_") >= 0:
-                                if not v.startswith(f"{self.dataset}."):
-                                    value = value.replace(v, f"'|%{v}%'")
-                            elif k.find("siglo") >= 0:
-                                value = value.replace(v, f"'{v}'")
-                            else:
-                                value = value.replace(v, f"' %{v}%'")
+                            value = value.replace(v, f"' %{v}%'")
 
-                result += f"{k} {value}{and_or}"        
+            result += f"{k} {value}{and_or}"        
         result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
         return result[0:-5] + ")"
     
@@ -1110,6 +1110,7 @@ class QMO:
         query = f"SELECT {fields} FROM {self.dataset}_fts "
         # query += self.fts_add(res_json["args"].keys())
         if res_json.get("dataset_2"):
+            query = query.replace("_fts", "")
             print("ON JOINING")
             joining_dict = self.joining(res_json["dataset_2"])
             joining_where = self.where(joining_dict["per"], "per")
@@ -1121,7 +1122,7 @@ class QMO:
         else:
             # query += self.where(res_json["args"].items())
             query += self.where_fts(res_json["args"].items())
-        query += f" ORDER BY rank LIMIT {res_json['limit']};" 
+        query += f" LIMIT {res_json['limit']};" 
         print(f"\n{query}\n".center(50 + len(query),"#"))
         with open("logs/query.log", mode="r+", encoding="utf-8") as file:
             if len(file.readlines()) <= 10:
