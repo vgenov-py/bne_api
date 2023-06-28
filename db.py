@@ -1052,9 +1052,9 @@ class QMO:
         result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
         return result[0:-5] + ")"
     
-    def where_fts(self, args: dict) -> str:
+    def where_fts(self, args: dict, dataset:str = None) -> str:
         args = dict(args)
-        print(args)
+        dataset = dataset if dataset else self.dataset
         if not args:
             return ""
         result = f"WHERE "
@@ -1062,16 +1062,16 @@ class QMO:
         for k,value in args.items():
             v = value.strip()
             if v.find("null") >= 0:
-                v_where = f'''{self.dataset}_fts.{k} IS NULL{and_or}'''
+                v_where = f'''{dataset}_fts.{k} IS NULL{and_or}'''
                 if v.find("!") >= 0:
                     v_where = v_where.replace("IS NULL", "IS NOT NULL")
             elif v.find("!") >= 0:
-                v_where = f'''{self.dataset}_fts.{k} NOT LIKE '%{v}%'{and_or}'''
+                v_where = f'''{dataset}_fts.{k} NOT LIKE '%{v}%'{and_or}'''
                 v_where = v_where.replace("!", "")
             else:
                 if v.find("||") >= 0:
                     v = v.replace("||", "* OR ")
-                v_where = f'''{self.dataset}_fts.{k} MATCH '{v}*'{and_or}'''
+                v_where = f'''{dataset}_fts.{k} MATCH '{v}*'{and_or}'''
 
             result += v_where
         # result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
@@ -1113,11 +1113,12 @@ class QMO:
             query = query.replace("_fts", "")
             print("ON JOINING")
             joining_dict = self.joining(res_json["dataset_2"])
-            joining_where = self.where(joining_dict["per"], "per")
+            # joining_where = self.where(joining_dict["per"], "per")
+            joining_where = self.where_fts(joining_dict["per"], "per")
             print(joining_where, "XX")
             where = self.where(res_json["args"].items())
             joining_where = where.replace("WHERE", f"{joining_where} AND ")
-            joining_where = joining_where.replace("WHERE", f"INNER JOIN per ON per.id = mon.per_id WHERE ")
+            joining_where = joining_where.replace("WHERE", f"INNER JOIN per_fts ON per_fts.id = mon.per_id  WHERE ")
             query += joining_where
         else:
             # query += self.where(res_json["args"].items())
