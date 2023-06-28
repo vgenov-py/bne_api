@@ -1057,22 +1057,21 @@ class QMO:
         print(args)
         if not args:
             return ""
-        result = f"WHERE {self.dataset}_fts MATCH "
+        result = f"WHERE "
         and_or = " AND "
         for k,value in args.items():
-            if value.strip() == "null":
-                v_where = f''''t_001: a *' AND {k} IS NULL {and_or}'''
-            elif value.strip() == "!null":
-                v_where = f''''t_001: a *' AND {k} IS NOT NULL {and_or}'''
-            elif value.find("!") >= 0:
-                v = value.replace("!", "")
-                result += "'t_001: a * NOT "
-                v_where = f'''{k}: {v}*' {and_or}'''
-            elif value.find("||") >= 0:
-                v = value.replace("||", "* OR ")
-                v_where = f''''{k}: {v}*' {and_or}'''
+            v = value.strip()
+            if v.find("null") >= 0:
+                v_where = f'''{self.dataset}_fts.{k} IS NULL{and_or}'''
+                if v.find("!") >= 0:
+                    v_where = v_where.replace("IS NULL", "IS NOT NULL")
+            elif v.find("!") >= 0:
+                v_where = f'''{self.dataset}_fts.{k} NOT LIKE '%{v}%'{and_or}'''
+                v_where = v_where.replace("!", "")
             else:
-                v_where = f''''{k}: {value}*' {and_or}'''
+                if v.find("||") >= 0:
+                    v = v.replace("||", "* OR ")
+                v_where = f'''{self.dataset}_fts.{k} MATCH '{v}*'{and_or}'''
 
             result += v_where
         # result = re.sub("\%\'\s{1,}\'\%|\%\'\s{1,}\'\|%", " ", result)
@@ -1130,7 +1129,14 @@ class QMO:
             lines = file.readlines()
             lines.extend(f"\n{dt.datetime.now()} | {query}\n")
             file.writelines(lines)
-        res = self.cur.execute(query)
+        try:
+            res = self.cur.execute(query)
+        except sqlite3.OperationalError as e:
+            res = {}
+            res["success"] = False
+            res["message"] = "SQLite3 Operational Error"
+            res["Error"] = f"{e}"
+            return res
         res_json = self.res_json
         res_json["success"] = True
         print(self.dataset)
