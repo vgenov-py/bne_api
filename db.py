@@ -1117,8 +1117,11 @@ class QMO:
             joining_where = self.where_fts(joining_dict["per"], "per")
             print(joining_where, "XX")
             where = self.where(res_json["args"].items())
-            joining_where = where.replace("WHERE", f"{joining_where} AND ")
             joining_where = joining_where.replace("WHERE", f"INNER JOIN per_fts ON per_fts.id = mon.per_id  WHERE ")
+            print(joining_where, "YY")
+            # joining_where = where.replace("WHERE", f"{joining_where} AND ")
+            print(joining_where, "DD")
+
             query += joining_where
         else:
             # query += self.where(res_json["args"].items())
