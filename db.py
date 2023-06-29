@@ -1126,6 +1126,13 @@ class QMO:
             if where_dataset:
                 joining_where += where_dataset
             query += joining_where
+
+            '''test:'''
+            # joining_where = self.where_fts(joining_dict["per"], "per")
+            # where_dataset = self.where_fts(res_json["args"].items())
+            # print(joining_where, where_dataset)
+            # query += f" WHERE per_id IN (SELECT id FROM per_fts {joining_where})"
+            # print(query)
         else:
             query += self.where_fts(res_json["args"].items())
         query += f" LIMIT {res_json['limit']};" 
