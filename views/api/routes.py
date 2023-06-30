@@ -46,6 +46,29 @@ def r_query(model):
     res = Response(response=data, mimetype="application/json", status=200)
     return res
 
+@api.route("/fields/<model>")
+def r_fields(model):
+    res = {}
+    test_QMO = QMO(model)
+    view = request.args.get("view")
+    if view:
+        if view == "human":
+            res["fields"] = []
+            fields = test_QMO.human_fields
+            for f in fields.split(","):
+                if f.find("NULL") == -1:
+                    res["fields"].append(f.split(".")[1])
+        elif view == "marc":
+            res["fields"] = []
+            fields = test_QMO.marc_fields
+            for f in fields.split(","):
+                if f.find("NULL") == -1:
+                    res["fields"].append(f.split(".")[1])
+
+        return res
+    res["fields"] = test_QMO.available_fields
+    return res
+
 @api.route("/entry/<model>")
 def r_entry_data_2(model):
     test_QMO = QMO(model, f"converter/{model}.json")
