@@ -1,6 +1,5 @@
 from constants import DB_FILE
 import sqlite3
-import apsw
 from flask import g
 import re
 from uuid import uuid4
