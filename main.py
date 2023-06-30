@@ -2,6 +2,7 @@ from flask import Flask, g
 import os
 from views.api.routes import api
 from views.home.routes import web
+from views.errors.routes import errors
 from constants import SECRET_KEY, DB_FILE
 from flask_cors import CORS
 
@@ -12,6 +13,7 @@ def create_app():
     app.config['JSON_SORT_KEYS'] = False
     app.config['JSON_AS_ASCII'] = False
     app.register_blueprint(api, url_prefix="/api")
+    app.register_blueprint(errors)
     app.register_blueprint(web)
     return app
 
