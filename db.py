@@ -8,6 +8,7 @@ from typing import Optional
 import datetime as dt
 import orjson as json
 import time
+import csv
 
 # def dict_factory(cursor, row):
 #     d = {}
@@ -1190,6 +1191,16 @@ class QMO:
                 res_json["success"] = True
                 res_json["time"] = time.perf_counter() - s
                 return res_json
-            # except Exception as e:
-            #     res_json["message"] = f"{e}"
-            #     return res_json
+
+    def write_csv(self, file_name: str, data):
+        with open(f"download/{file_name}", "w", encoding="utf-8") as file:
+            fields = data[0].__struct_fields__
+            csv_writer = csv.writer(file, delimiter=";")
+            csv_writer.writerow(fields)
+
+            for record in data:
+                to_write = []
+                for f in fields:
+                    to_write.append(eval(f"{record}.{f}"))
+                    
+                csv_writer.writerow(to_write)
