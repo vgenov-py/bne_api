@@ -53,7 +53,7 @@ def r_query(model):
             now = dt.datetime.now()
             file_name = f"{now.year}{now.month}{now.day}{model}.csv"
             test_QMO.write_csv(file_name,data["data"])
-            return send_file(file_name, as_attachment=True)
+            return send_file(f"download/{file_name}", as_attachment=True)
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
     return res
