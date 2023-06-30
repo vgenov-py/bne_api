@@ -7,7 +7,7 @@ from uuid import uuid4
 import msgspec
 from typing import Optional
 import datetime as dt
-# import orjson as json
+import orjson as json
 import time
 
 # def dict_factory(cursor, row):
@@ -188,7 +188,6 @@ class Mon(msgspec.Struct, omit_defaults=True):
 structs = {
     "geo": Geo,"per":Per, "mon":Mon
 }
-
 
 class QMO:
     def __init__(self,dataset:str,  args:dict=None, json_file:str=None):
@@ -670,9 +669,9 @@ class QMO:
         if not value:
             return
         try:
-            return languages[value[37:40].strip()]
+            return languages[value[38:41].strip()]
         except:
-            return value[37:40].strip()
+            return value[38:41].strip()
 
     def other_languages(self, value:str) -> str:
         if not value:
@@ -705,12 +704,12 @@ class QMO:
     def publication_date(self, value:str) -> str:
         if not value:
             return
-        return value[9:13]
+        return value[10:14]
     
     def decade(self, value:str) -> str:
         if not value:
             return
-        n:str = value[9:13]
+        n:str = value[10:14]
         try:
             if n[2].isdigit():
                 return f"{n[2]}0"
@@ -721,7 +720,7 @@ class QMO:
         if not value:
             return
         centuries = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"]
-        n = value[9:13]
+        n = value[10:14]
         n = re.sub("(?![0-9]).", "0", n)
         try:
             return centuries[int(n)//100]
@@ -1073,6 +1072,8 @@ class QMO:
                 v_where = v_where.replace("!", "")
             elif k == "all":
                 v_where = f'''{dataset}_fts MATCH '{v}*'{and_or}'''
+            elif k == "siglo" or k == "decada":
+                v_where = f'''{dataset}_fts.{k} MATCH '{v}'{and_or}'''
             else:
                 if v.find("||") >= 0:
                     v = v.replace("||", "* OR ")
