@@ -42,7 +42,7 @@ def r_query(model):
 
     if data["success"]:
         data["length"] = 0
-
+        data.pop("query")
         data["data"] = tuple(data["data"])
         print("data - TUPLE: ",dt.datetime.now())
         data["time"] = time.perf_counter() - s
@@ -106,7 +106,7 @@ def r_blunt_query(model):
     return res
 
 
-@api.route("/test")
+@api.route("/searchesD2z2UAdAydEX1")
 def r_test():
     test_qmo = QMO("per")
     data = test_qmo.searches()
