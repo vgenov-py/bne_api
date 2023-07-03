@@ -42,7 +42,6 @@ def r_query(model):
 
     if data["success"]:
         data["length"] = 0
-        data.pop("query")
         data["data"] = tuple(data["data"])
         print("data - TUPLE: ",dt.datetime.now())
         data["time"] = time.perf_counter() - s
@@ -56,6 +55,7 @@ def r_query(model):
             test_QMO.write_csv(file_name,data["data"])
             return send_file(f"{os.getcwd()}/download/{file_name}", as_attachment=True)
         enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"])
+        data.pop("query")
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
     return res
