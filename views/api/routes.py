@@ -55,7 +55,7 @@ def r_query(model):
             file_name = f"{now.year}{now.month}{now.day}{model}.csv"
             test_QMO.write_csv(file_name,data["data"])
             return send_file(f"{os.getcwd()}/download/{file_name}", as_attachment=True)
-        enter(data["query"], data["length"], now, request.remote_addr, model, data["time"])
+        enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"])
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
     return res
