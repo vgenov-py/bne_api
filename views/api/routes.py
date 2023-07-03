@@ -8,6 +8,7 @@ import pstats
 import msgspec
 import csv
 import orjson as json
+from views.api.utils import enter 
 import os
 from qargs import Qargs
 api = Blueprint("api", __name__)
@@ -48,12 +49,13 @@ def r_query(model):
         data["length"] += len(data["data"])
         print("TIME: ",data["time"])
         print(data["length"])
+        now = dt.datetime.now()
         if request.url.find("csv") >= 0:
             os.system("rm -r download/*.csv")
-            now = dt.datetime.now()
             file_name = f"{now.year}{now.month}{now.day}{model}.csv"
             test_QMO.write_csv(file_name,data["data"])
             return send_file(f"{os.getcwd()}/download/{file_name}", as_attachment=True)
+        enter(data["query"], data["length"], now, request.remote_addr, model, data["time"])
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
     return res
@@ -110,26 +112,8 @@ def r_blunt_query(model):
 
 @api.route("/test")
 def r_test():
-    start = time.perf_counter()
-    def dict_factory(cursor, row):
-        d = {}
-        for idx, col in enumerate(cursor.description):
-            d[col[0]] = row[idx]
-        return d
-    con = sqlite3.connect("instance/bne.db", isolation_level=None)
-    con.row_factory = dict_factory
-    con.execute("PRAGMA journal_mode=wal")
-    data = list(con.execute("SELECT * FROM per where t_375 like '%masculino%'"))
-    delta = time.perf_counter()-start
-    res = {
-        "time":delta,
-        "data":data
-    }
-    res = make_response(msgspec.json.decode(data).encode("utf8"))
-    res.headers["mime-type"] = "application/json"
-    print(delta)
-    print(time.perf_counter() - start )
-    return res
+    enter()
+    return "res"
 
 @api.route("/qargs")
 def r_qargs():

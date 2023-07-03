@@ -1152,6 +1152,7 @@ class QMO:
         res_json = self.res_json
         res_json["success"] = True
         res_json["data"] = map(lambda row:structs[self.dataset](*row),res)
+        res_json["query"] = query
         return res_json
     
     def blunt_query(self):
