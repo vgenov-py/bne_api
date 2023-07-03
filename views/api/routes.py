@@ -83,10 +83,6 @@ def r_fields(model):
     res["fields"] = test_QMO.available_fields
     return res
 
-@api.route("/csv")
-def r_csv():
-    
-    return send_file("converter/geografico_flat.txt", as_attachment=True)
 
 @api.route("/entry/<model>")
 def r_entry_data_2(model):
@@ -112,8 +108,12 @@ def r_blunt_query(model):
 
 @api.route("/test")
 def r_test():
-    enter()
-    return "res"
+    test_qmo = QMO("per")
+    data = test_qmo.searches()
+    data = tuple(data["data"])
+    data = msgspec.json.encode(data)
+    res = Response(response=data, mimetype="application/json", status=200)
+    return res
 
 @api.route("/qargs")
 def r_qargs():

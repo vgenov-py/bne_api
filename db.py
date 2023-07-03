@@ -1155,6 +1155,15 @@ class QMO:
         res_json["query"] = query
         return res_json
     
+    def searches(self) -> dict:
+        qu = self.cur.execute("SELECT * FROM queries ORDER BY date;")
+        res = {}
+        res["data"] = map(lambda row:structs[self.dataset](*row),qu)
+        return res
+        
+
+
+    
     def blunt_query(self):
         query: str = self.args.get("query")
         res_json = self.res_json
