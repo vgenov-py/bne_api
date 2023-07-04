@@ -1,6 +1,6 @@
-from flask import Blueprint,  request, render_template, make_response, Response, send_file
+from flask import Blueprint,  request, render_template, Response, send_file
 from db import QMO
-import sqlite3
+from mmo import MMO
 import time
 import datetime as dt
 import cProfile
@@ -8,9 +8,7 @@ import pstats
 import msgspec
 import csv
 import orjson as json
-from views.api.utils import enter 
 import os
-from qargs import Qargs
 api = Blueprint("api", __name__)
 '''
 
@@ -24,7 +22,6 @@ mysql -u root -p xray < back.sql
 
 @api.route("/")
 def r_home():
-    test = QMO("per")
     return render_template("index.html")
 
 @api.route("/<model>")
@@ -54,7 +51,7 @@ def r_query(model):
             file_name = f"{now.year}{now.month}{now.day}{model}.csv"
             test_QMO.write_csv(file_name,data["data"])
             return send_file(f"{os.getcwd()}/download/{file_name}", as_attachment=True)
-        enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"])
+        test_QMO.enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"])
         data.pop("query")
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
@@ -86,7 +83,7 @@ def r_fields(model):
 
 @api.route("/entry/<model>")
 def r_entry_data_2(model):
-    test_QMO = QMO(model, f"converter/{model}.json")
+    test_QMO = MMO(model)
     return test_QMO.insert()
 
 @api.route("/blunt/<model>")
@@ -115,12 +112,6 @@ def r_test():
     res = Response(response=data, mimetype="application/json", status=200)
     return res
 
-@api.route("/qargs")
-def r_qargs():
-    data_purgue = QMO("per")
-    print(data_purgue.purgue)
-    test_1 = Qargs()
-    return "test_1.query"
 
 
 

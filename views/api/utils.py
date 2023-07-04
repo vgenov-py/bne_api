@@ -3,17 +3,17 @@ import sqlite3
 from uuid import uuid4
 from os import getcwd
 
-def get_db():
-    db = getattr(g, '_database', None)
-    if db is None:
-        db = g._database = sqlite3.connect("query_saver.db")
-    return db
+# def get_db():
+#     db = getattr(g, '_database', None)
+#     if db is None:
+#         db = g._database = sqlite3.connect("query_saver.db")
+#     return db
 
 
 def enter(query:str, length:int, date:str,ip:str,dataset:str,time:float):
-    db = get_db()
+    # db = get_db()
     
-    cur = db.cursor()
+    # cur = db.cursor()
     
     query_str = f'''
                 INSERT INTO queries VALUES(
@@ -26,6 +26,5 @@ def enter(query:str, length:int, date:str,ip:str,dataset:str,time:float):
                 {time}
                 )
                 '''
-    print(query_str)
-    cur.execute(query_str)
-    db.commit()
+    # cur.execute(query_str)
+    # db.commit()
