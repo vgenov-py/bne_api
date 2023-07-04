@@ -13,6 +13,11 @@ def get_db():
         db = g._database = sqlite3.connect(DB_FILE)
     return db
 
+'''
+FOR TESTING PURPOSE:
+'''
+def get_db():
+    return sqlite3.connect(DB_FILE)
 
 class MMO:
     '''
@@ -267,6 +272,28 @@ class MMO:
             result.append(self.mon_subject(record, ("655", "752", "770","772", "773", "774", "775", "776", "777", "787", "800", "810", "811", "830", "980")))
             "Tipo de documento:"
             result.append(self.mon_document_type(record.get("994")))
+
+        elif dataset == "ent":
+            result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
+            result.append(record.get("001"))
+            result.append(record.get("024"))
+            result.append(record.get("046"))
+            result.append(record.get("110"))
+            result.append(record.get("368"))
+            result.append(record.get("370"))
+            result.append(record.get("372"))
+            result.append(record.get("377"))
+            result.append(record.get("410"))
+            result.append(record.get("500"))
+            result.append(record.get("510"))
+            result.append(record.get("663"))
+            result.append(record.get("665"))
+            result.append(record.get("667"))
+            result.append(record.get("670"))
+            result.append(record.get("678"))
+
+
+
 
         return tuple(result)
 
@@ -720,6 +747,29 @@ class MMO:
                 r = f"Monografía en papel (posterior a 1830)"
                 return r
             return 'MONOMODER-RECELE: "Monografía electrónica"'
+    
+    '''
+    ENT:
+    '''
+
+    def ent_other_identifiers(self, value:str) -> str:
+        '''024 -> |2: |a'''
+        if not value:
+            return
+        d_2 = self.get_single_dollar(value, "2")
+        d_a = self.get_single_dollar(value, "a")
+        return f"{d_2}: {d_a}"
+    
+    def ent_establishment_date(self, value:str) -> str:
+        '''046 -> IF |q -> q || | !|q -> |s'''
+        if not value:
+            return
+        d_q = self.get_single_dollar(value, "q")
+        if d_q:
+            return d_q
+        d_s = self.get_single_dollar(value, "s")
+        if d_s:
+            return d_s
     
     def insert(self):
         res_json = {"success":False}
