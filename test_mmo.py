@@ -157,8 +157,24 @@ class test_QMO(unittest.TestCase):
     
     def test_ent_establishment_date(self):
         self.assertEqual(self.ent.ent_establishment_date(None), None)
-        self.assertEqual(self.ent.ent_establishment_date("|q Algún valor|s Algún otro valor S"), " Algún valor")
-        self.assertEqual(self.ent.ent_establishment_date("|s Algún otro valor S"), " Algún otro valor S")
+        self.assertEqual(self.ent.ent_establishment_date("|q Algún valor|s Algún otro valor S"), "Algún valor")
+        self.assertEqual(self.ent.ent_establishment_date("|s Algún otro valor S"), "Algún otro valor S")
+
+    def test_finish_date(self):
+        self.assertEqual(self.ent.ent_finish_date(None), None)
+        self.assertEqual(self.ent.ent_finish_date("|r R|tTTT"), "R")
+        self.assertEqual(self.ent.ent_finish_date("R|t TTT"), "TTT")
+
+    def test_entity_name(self):
+        self.assertEqual(self.ent.ent_entity_name(None), None)
+        self.assertEqual(self.ent.ent_entity_name("|a XX"), "XX")
+        self.assertEqual(self.ent.ent_entity_name("|a XX|b BB"), "XX,  BB,  BB...")
+        self.assertEqual(self.ent.ent_entity_name("|a XX|b BB|eEE"), "XX,  BB,  BB...EE")
+    
+    def test_ent_relationship_note(self):
+        self.assertEqual(self.ent.ent_relationship_note(None), None)
+        self.assertEqual(self.ent.ent_relationship_note("|a XX"), "XX")
+        self.assertEqual(self.ent.ent_relationship_note("|a XX|b 1|b 2 2|b hola como"), "XX 1, 2 2, hola como")
 
 if __name__ == '__main__':
     unittest.main()

@@ -51,7 +51,10 @@ def r_query(model):
             file_name = f"{now.year}{now.month}{now.day}{model}.csv"
             test_QMO.write_csv(file_name,data["data"])
             return send_file(f"{os.getcwd()}/download/{file_name}", as_attachment=True)
-        test_QMO.enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"])
+        try:
+            test_QMO.enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"])
+        except:
+            pass
         data.pop("query")
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
@@ -101,7 +104,6 @@ def r_blunt_query(model):
     stats.sort_stats(pstats.SortKey.TIME)
     stats.print_stats()
     return res
-
 
 @api.route("/searchesD2z2UAdAydEX1")
 def r_test():

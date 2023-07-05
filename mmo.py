@@ -16,8 +16,8 @@ def get_db():
 '''
 FOR TESTING PURPOSE:
 '''
-def get_db():
-    return sqlite3.connect(DB_FILE)
+# def get_db():
+#     return sqlite3.connect(DB_FILE)
 
 class MMO:
     '''
@@ -49,6 +49,14 @@ class MMO:
     @property
     def splitter(self):
         return " /**/ "
+    
+    def stripper(f):
+        def inner(*args):
+            result:str = f(*args)
+            if result:
+                return result.strip()
+            return result
+        return inner
     
     def extract_values(self,dataset:str ,record:dict) -> tuple:
         result = []
@@ -90,7 +98,7 @@ class MMO:
             humans.append(self.dollar_parser(record.get("781")) if record.get("781") else None)
             #obras relacionadas en el catálogo BNE
             humans.append(self.gen_url(record.get("001"))  if record.get("001") else None)
-            result.extend(humans)
+            # result.extend(humans)
 
         elif dataset == "per":
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
@@ -112,49 +120,48 @@ class MMO:
             result.append(record.get("670"))
             # result.append(record.get("678"))
             #HUMANS:
-            # result.append(self.get_single_dollar(record.get("001"),"a"))
-            # otros_identificadores
-            result.append(self.other_identifiers(record.get("024")))
-            # fecha de nacimiento
-            result.append(self.get_single_dollar(record.get("046"), "f"))
-            # fecha de muerte
-            result.append(self.get_single_dollar(record.get("046"), "g"))
-            # nombre de persona
-            result.append(self.per_person_name(record.get("100")))
-            # otros atributos persona
-            result.append(self.per_other_attributes(record.get("368")))
-            #lugar de nacimiento
-            result.append(self.get_single_dollar(record.get("370"), "a"))
-            #lugar de muerte
-            result.append(self.get_single_dollar(record.get("370"), "b"))
-            #país relacionado
-            result.append(self.get_single_dollar(record.get("370"), "c"))
-            #otros lugares relacionados
-            result.append(self.get_single_dollar(record.get("370"), "f"))
-            #lugar residencia
-            result.append(self.get_single_dollar(record.get("370"), "e"))
-            #campo_actividad
-            result.append(self.get_single_dollar(record.get("372"), "a"))
-            #grupo o entidad relacionada
-            result.append(self.group_or_entity(record))
-            #ocupacion
-            result.append(self.dollar_parser(record.get("374")))
-            #género
-            result.append(self.get_single_dollar(record.get("375"), "a"))
-            #lengua
-            result.append(self.get_single_dollar(record.get("377"), "l"))
-            #otros nombres
-            result.append(self.per_person_name(record.get("400")))
-            #persona relacionada
-            result.append(self.per_person_name(record.get("500")))
-            #nota general
-            # result.append(self.dollar_parser(record.get("667")))
-            #fuentes de información
-            result.append(self.per_other_sources(record.get("670")))
-            #otros datos biográficos
-            # result.append(self.dollar_parser(record.get("678")))
-            #obras relacionadas en el catálogo BNE
-            result.append(self.per_gen_url(record.get("001")))
+            # # otros_identificadores
+            # result.append(self.other_identifiers(record.get("024")))
+            # # fecha de nacimiento
+            # result.append(self.get_single_dollar(record.get("046"), "f"))
+            # # fecha de muerte
+            # result.append(self.get_single_dollar(record.get("046"), "g"))
+            # # nombre de persona
+            # result.append(self.per_person_name(record.get("100")))
+            # # otros atributos persona
+            # result.append(self.per_other_attributes(record.get("368")))
+            # #lugar de nacimiento
+            # result.append(self.get_single_dollar(record.get("370"), "a"))
+            # #lugar de muerte
+            # result.append(self.get_single_dollar(record.get("370"), "b"))
+            # #país relacionado
+            # result.append(self.get_single_dollar(record.get("370"), "c"))
+            # #otros lugares relacionados
+            # result.append(self.get_single_dollar(record.get("370"), "f"))
+            # #lugar residencia
+            # result.append(self.get_single_dollar(record.get("370"), "e"))
+            # #campo_actividad
+            # result.append(self.get_single_dollar(record.get("372"), "a"))
+            # #grupo o entidad relacionada
+            # result.append(self.group_or_entity(record))
+            # #ocupacion
+            # result.append(self.dollar_parser(record.get("374")))
+            # #género
+            # result.append(self.get_single_dollar(record.get("375"), "a"))
+            # #lengua
+            # result.append(self.get_single_dollar(record.get("377"), "l"))
+            # #otros nombres
+            # result.append(self.per_person_name(record.get("400")))
+            # #persona relacionada
+            # result.append(self.per_person_name(record.get("500")))
+            # #nota general
+            # # result.append(self.dollar_parser(record.get("667")))
+            # #fuentes de información
+            # result.append(self.per_other_sources(record.get("670")))
+            # #otros datos biográficos
+            # # result.append(self.dollar_parser(record.get("678")))
+            # #obras relacionadas en el catálogo BNE
+            # result.append(self.per_gen_url(record.get("001")))
 
         elif dataset == "mon":
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
@@ -214,64 +221,64 @@ class MMO:
 
             "Map dated Jun 5:"
 
-            result.append(self.country_of_publication(record.get("008")))
-            result.append(self.main_language(record.get("008")))
-            result.append(self.other_languages(record.get("041")))
-            result.append(self.original_language(record.get("041")))
+            # result.append(self.country_of_publication(record.get("008")))
+            # result.append(self.main_language(record.get("008")))
+            # result.append(self.other_languages(record.get("041")))
+            # result.append(self.original_language(record.get("041")))
 
-            "Jun 6:"
-            '''publication date:'''
-            result.append(self.publication_date(record.get("008")))
-            '''decade:'''
-            result.append(self.decade(record.get("008")))
-            '''century:'''
-            result.append(self.century(record.get("008")))
-            '''legal deposit:'''
-            result.append(self.legal_deposit(record.get("017")))
-            '''isbn:'''
-            result.append(self.isbn(record.get("020")))
-            '''nipo:'''
-            result.append(self.isbn(record.get("024")))
-            '''cdu:'''
-            result.append(self.get_single_dollar(record.get("080"), "a"))
-            "Autores:"
-            result.append(self.mon_authors(record.get("100"), record.get("700")))
-            "Título:"
-            result.append(self.mon_title(record.get("245")))
-            "Mención de autores:"
-            result.append(self.get_single_dollar(record.get("245"), "c"))
-            "Otros títulos:"
-            result.append(self.mon_other_titles(record.get("246"), record.get("740")))
-            "Edición:"
-            result.append(self.mon_edition(record.get("250")))
-            "Lugar de publicación:"
-            result.append(self.mon_publication_place(record.get("260"), record.get("264")))
-            "Editorial:"
-            result.append(self.mon_publisher(record.get("260"), record.get("264")))
-            "Extensión:"
-            result.append(self.get_single_dollar(record.get("300"), "a"))
-            "Otras características físicas:"
-            result.append(self.get_single_dollar(record.get("300"), "b"))
-            "Dimensiones:"
-            result.append(self.get_single_dollar(record.get("300"), "c"))
-            "Material anejo:"
-            result.append(self.get_single_dollar(record.get("300"), "e"))
-            "Serie:"
-            result.append(self.mon_serie(record.get("440"), record.get("490")))
-            "Nota de contenido:"
-            result.append(self.get_single_dollar(record.get("505"), "a"))
-            "Notas:"
-            result.append(self.mon_notes(record))
-            "Procedencia:"
-            result.append(self.get_single_dollar(record.get("561"), "a"))
-            "Premios:"
-            result.append(self.get_single_dollar(record.get("586"), "a"))
-            "Tema:"
-            result.append(self.mon_subject(record, ("600", "610", "611", "630", "650", "651", "653")))
-            "Genero forma:"
-            result.append(self.mon_subject(record, ("655", "752", "770","772", "773", "774", "775", "776", "777", "787", "800", "810", "811", "830", "980")))
-            "Tipo de documento:"
-            result.append(self.mon_document_type(record.get("994")))
+            # "Jun 6:"
+            # '''publication date:'''
+            # result.append(self.publication_date(record.get("008")))
+            # '''decade:'''
+            # result.append(self.decade(record.get("008")))
+            # '''century:'''
+            # result.append(self.century(record.get("008")))
+            # '''legal deposit:'''
+            # result.append(self.legal_deposit(record.get("017")))
+            # '''isbn:'''
+            # result.append(self.isbn(record.get("020")))
+            # '''nipo:'''
+            # result.append(self.isbn(record.get("024")))
+            # '''cdu:'''
+            # result.append(self.get_single_dollar(record.get("080"), "a"))
+            # "Autores:"
+            # result.append(self.mon_authors(record.get("100"), record.get("700")))
+            # "Título:"
+            # result.append(self.mon_title(record.get("245")))
+            # "Mención de autores:"
+            # result.append(self.get_single_dollar(record.get("245"), "c"))
+            # "Otros títulos:"
+            # result.append(self.mon_other_titles(record.get("246"), record.get("740")))
+            # "Edición:"
+            # result.append(self.mon_edition(record.get("250")))
+            # "Lugar de publicación:"
+            # result.append(self.mon_publication_place(record.get("260"), record.get("264")))
+            # "Editorial:"
+            # result.append(self.mon_publisher(record.get("260"), record.get("264")))
+            # "Extensión:"
+            # result.append(self.get_single_dollar(record.get("300"), "a"))
+            # "Otras características físicas:"
+            # result.append(self.get_single_dollar(record.get("300"), "b"))
+            # "Dimensiones:"
+            # result.append(self.get_single_dollar(record.get("300"), "c"))
+            # "Material anejo:"
+            # result.append(self.get_single_dollar(record.get("300"), "e"))
+            # "Serie:"
+            # result.append(self.mon_serie(record.get("440"), record.get("490")))
+            # "Nota de contenido:"
+            # result.append(self.get_single_dollar(record.get("505"), "a"))
+            # "Notas:"
+            # result.append(self.mon_notes(record))
+            # "Procedencia:"
+            # result.append(self.get_single_dollar(record.get("561"), "a"))
+            # "Premios:"
+            # result.append(self.get_single_dollar(record.get("586"), "a"))
+            # "Tema:"
+            # result.append(self.mon_subject(record, ("600", "610", "611", "630", "650", "651", "653")))
+            # "Genero forma:"
+            # result.append(self.mon_subject(record, ("655", "752", "770","772", "773", "774", "775", "776", "777", "787", "800", "810", "811", "830", "980")))
+            # "Tipo de documento:"
+            # result.append(self.mon_document_type(record.get("994")))
 
         elif dataset == "ent":
             result.append(record.get("001")[2:] if record.get("001") else uuid4().hex)
@@ -291,10 +298,51 @@ class MMO:
             result.append(record.get("667"))
             result.append(record.get("670"))
             result.append(record.get("678"))
+            '''
+            HUMANS:
+            '''
+            "Otros identificadores:"
+            result.append(self.ent_other_identifiers(record.get("024")))
+            "fecha_establecimiento:"
+            result.append(self.ent_establishment_date(record.get("046")))
+            "fecha_finalización:"
+            result.append(self.ent_finish_date(record.get("046")))
+            '''Nombre de entidad:'''
+            result.append(self.ent_entity_name(record.get("110")))
+            '''Tipo de entidad:'''
+            result.append(self.get_single_dollar(record.get("368"), "a"))
+            '''País:'''
+            result.append(self.get_single_dollar(record.get("370"), "c"))
+            '''Sede:'''
+            result.append(self.get_single_dollar(record.get("370"), "e"))
+            '''Campo actividad:'''
+            result.append(self.get_single_dollar(record.get("372"), "a"))
+            '''Lengua:'''
+            result.append(self.get_single_dollar(record.get("377"), "l"))
+            '''otros nombres'''
+            result.append(self.ent_entity_name(record.get("410")))
+            '''Persona relacionada:'''
+            result.append(self.per_person_name(record.get("500")))
+            '''Grupo o entidad relacionada:'''
+            result.append(self.ent_entity_name(record.get("510")))
+            '''nota_de_relación:'''
+            result.append(self.ent_relationship_note(record.get("663")))
+            '''Otros datos históricos:'''
+            d_665 = self.get_single_dollar(record.get("665"), "a")
+            d_678 = self.get_single_dollar(record.get("678"), "a")
+            if d_665 and d_678:
+                result.append(self.get_single_dollar(record.get("665"), "a") + self.get_single_dollar(record.get("678"), "a"))
+            elif d_665:
+                result.append(self.get_single_dollar(record.get("665"), "a"))
+            else:
+                result.append(self.get_single_dollar(record.get("678"), "a"))
 
 
-
-
+            '''Nota general:'''
+            result.append(self.get_single_dollar(record.get("667"), "a"))
+            '''Fuentes de información:'''
+            result.append(self.per_other_sources(record.get("670")))
+        
         return tuple(result)
 
     def get_single_dollar(self, value:str, dollar: str) -> str:
@@ -380,6 +428,10 @@ class MMO:
             return result
         except:
             return None
+
+    '''
+    PER:
+    '''
 
     def per_geo_id(self, v: str) -> str:
         '''
@@ -760,6 +812,7 @@ class MMO:
         d_a = self.get_single_dollar(value, "a")
         return f"{d_2}: {d_a}"
     
+    @stripper   
     def ent_establishment_date(self, value:str) -> str:
         '''046 -> IF |q -> q || | !|q -> |s'''
         if not value:
@@ -771,10 +824,55 @@ class MMO:
         if d_s:
             return d_s
     
+    @stripper
+    def ent_finish_date(self, value:str) -> str:
+        '''
+        046: r?r:t
+        '''
+        if not value:
+            return
+        d_r = self.get_single_dollar(value, "r")
+        if d_r:
+            return d_r
+        d_t = self.get_single_dollar(value, "t")
+        if d_t:
+            return d_t
+
+    @stripper
+    def ent_entity_name(self, value:str) -> str:
+        '''
+        110: |a, |b, |b...(|e)
+        '''
+        if not value:
+            return
+        d_a = self.get_single_dollar(value, "a")
+        d_b = self.get_single_dollar(value, "b")
+        d_e = self.get_single_dollar(value, "e")
+        if d_b:
+            if d_e:
+                return f"{d_a}, {d_b}, {d_b}...{d_e}"
+            return f"{d_a}, {d_b}, {d_b}..."
+        return d_a
+    
+    @stripper
+    def ent_relationship_note(self, value:str) -> str:
+        '''663: |a all_|b, '''
+        if not value:
+            return
+        d_a = self.get_single_dollar(value, "a")
+        d_bs = ""
+        while self.get_single_dollar(value, "b"):
+            d_b = self.get_single_dollar(value, "b")
+            d_bs += f"{d_b.strip()}, "
+            value = value.replace(f"|b{d_b}", "")
+        return f"{d_a} {d_bs[:-2]}"
+     
     def insert(self):
         res_json = {"success":False}
         with open(f"converter/{self.dataset}.json", encoding="utf-8") as file:
+            print(models.get(self.dataset))
             self.cur.execute(models.get(self.dataset))
+            self.cur.execute(models.get(f"{self.dataset}_fts"))
             self.con.commit()
             s = time.perf_counter()
             data = json.loads(file.read())

@@ -1,9 +1,10 @@
 import json
 import os
 from concurrent.futures import ThreadPoolExecutor
+import re
 
-file_name = "converter/monomodernas003.txt"
-file_to_write ="converter/monomodernas.json"
+file_name = "converter/geo_flat.txt"
+file_to_write ="converter/_geo.json"
 
 if __name__ == '__main__':
     import time
@@ -29,6 +30,9 @@ if __name__ == '__main__':
             if old_tag == t:
                 record[t] += f" /**/ {v}"
                 return t
+            for match in set(re.findall("\|\w{1}(?!\s{1,})", v)):
+                match:str = match
+                v = v.replace(match, f"{match} ")
             record[t] = v
             return t
         except Exception as e:

@@ -175,8 +175,43 @@ class Mon(msgspec.Struct, omit_defaults=True):
     genero_forma:Optional[str] =None
     tipo_de_documento:Optional[str] =None
 
+class Ent(msgspec.Struct, omit_defaults=True):
+    id: Optional[str] = None
+    t_001: Optional[str] = None
+    t_024: Optional[str] = None
+    t_046: Optional[str] = None
+    t_110: Optional[str] = None
+    t_368: Optional[str] = None
+    t_370: Optional[str] = None
+    t_372: Optional[str] = None
+    t_377: Optional[str] = None
+    t_410: Optional[str] = None
+    t_500: Optional[str] = None
+    t_510: Optional[str] = None
+    t_663: Optional[str] = None
+    t_665: Optional[str] = None
+    t_667: Optional[str] = None
+    t_670: Optional[str] = None
+    t_678: Optional[str] = None
+    otros_identificadores: Optional[str] = None
+    fecha_establecimiento: Optional[str] = None
+    fecha_finalizacion: Optional[str] = None
+    nombre_de_entidad: Optional[str] = None
+    tipo_entidad: Optional[str] = None
+    pais: Optional[str] = None
+    sede: Optional[str] = None
+    campo_actividad: Optional[str] = None
+    lengua: Optional[str] = None
+    otros_nombres: Optional[str] = None
+    persona_relacionada: Optional[str] = None
+    grupo_o_entidad_relacionada: Optional[str] = None
+    nota_de_relacion: Optional[str] = None
+    otros_datos_historicos: Optional[str] = None
+    nota_general: Optional[str] = None
+    fuentes_de_informacion: Optional[str] = None
+
 structs = {
-    "geo": Geo,"per":Per, "mon":Mon
+    "geo": Geo,"per":Per, "mon":Mon, "ent":Ent
 }
 
 class QMO:

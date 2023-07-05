@@ -28,7 +28,6 @@ query_create_geo = f'''
     );
 '''
 
-
 query_create_per = f'''
     CREATE TABLE IF NOT EXISTS per (
     id TEXT PRIMARY KEY,
@@ -158,14 +157,51 @@ query_create_mon = f'''
     );
 '''
 
-create_statements = {"per": query_create_per, "geo": query_create_geo, "mon": query_create_mon}
+query_create_ent = '''
+CREATE TABLE IF NOT EXISTS ent (
+            id TEXT,
+            t_001 TEXT,
+            t_024 TEXT,
+            t_046 TEXT,
+            t_110 TEXT,
+            t_368 TEXT,
+            t_370 TEXT,
+            t_372 TEXT,
+            t_377 TEXT,
+            t_410 TEXT,
+            t_500 TEXT,
+            t_510 TEXT,
+            t_663 TEXT,
+            t_665 TEXT,
+            t_667 TEXT,
+            t_670 TEXT,
+            t_678 TEXT,
+            otros_identificadores TEXT,
+            fecha_establecimiento TEXT,
+            fecha_finalizacion TEXT,
+            nombre_de_entidad TEXT,
+            tipo_entidad TEXT,
+            pais TEXT,
+            sede TEXT,
+            campo_actividad TEXT,
+            lengua TEXT,
+            otros_nombres TEXT,
+            persona_relacionada TEXT,
+            grupo_o_entidad_relacionada TEXT,
+            nota_de_relacion TEXT,
+            otros_datos_historicos TEXT,
+            nota_general TEXT,
+            fuentes_de_informacion TEXT
+            );
+'''
+
+
 
 query_create_queries = '''
-    CREATE VIRTUAL TABLES queries USING FTS5 (id, query, length, date, ip, dataset, time, is_from_web);    
+    CREATE VIRTUAL TABLE queries USING FTS5 (id, query, length, date, dataset, time, is_from_web);    
 '''
-
-'''
-    CREATE VIRTUAL TABLE geo_fts USING FTS5(
+query_create_geo_fts ='''
+    CREATE VIRTUAL TABLE IF NOT EXISTS geo_fts USING FTS5(
         id,
         t_001,
         t_024,
@@ -193,8 +229,8 @@ query_create_queries = '''
         obras_relacionadas_en_el_catalogo_BNE
     );
 '''
-'''
-    CREATE VIRTUAL TABLE per_fts USING FTS5(
+query_create_per_fts ='''
+    CREATE VIRTUAL TABLE IF NOT EXISTS per_fts USING FTS5(
     id,
     t_001,
     t_024,
@@ -233,8 +269,8 @@ query_create_queries = '''
     );
 '''
 
-'''
-CREATE VIRTUAL TABLE mon_fts USING FTS5(
+query_create_mon_fts ='''
+CREATE VIRTUAL TABLE IF NOT EXISTS mon_fts USING FTS5(
     id,
     t_001,
     t_008,
@@ -321,3 +357,52 @@ CREATE VIRTUAL TABLE mon_fts USING FTS5(
     tipo_de_documento
     );
 '''
+
+query_create_ent_fts ='''
+CREATE VIRTUAL TABLE IF NOT EXISTS ent_fts USING FTS5(
+            id,
+            t_001,
+            t_024,
+            t_046,
+            t_110,
+            t_368,
+            t_370,
+            t_372,
+            t_377,
+            t_410,
+            t_500,
+            t_510,
+            t_663,
+            t_665,
+            t_667,
+            t_670,
+            t_678,
+            otros_identificadores,
+            fecha_establecimiento,
+            fecha_finalizacion,
+            nombre_de_entidad,
+            tipo_entidad,
+            pais,
+            sede,
+            campo_actividad,
+            lengua,
+            otros_nombres,
+            persona_relacionada,
+            grupo_o_entidad_relacionada,
+            nota_de_relacion,
+            otros_datos_historicos,
+            nota_general,
+            fuentes_de_informacion
+            );
+'''
+
+create_statements = {
+    "per": query_create_per, 
+    "geo": query_create_geo, 
+    "mon": query_create_mon, 
+    "ent": query_create_ent,
+    "per_fts": query_create_per, 
+    "geo_fts": query_create_geo, 
+    "mon_fts": query_create_mon, 
+    "ent_fts": query_create_ent
+    }
