@@ -210,8 +210,16 @@ class Ent(msgspec.Struct, omit_defaults=True):
     nota_general: Optional[str] = None
     fuentes_de_informacion: Optional[str] = None
 
+class Queries(msgspec.Struct, omit_defaults=True):
+    id:Optional[str]=None
+    query:Optional[str]=None
+    length:Optional[str]=None
+    date:Optional[str]=None
+    ip:Optional[str]=None
+    dataset:Optional[str]=None
+    time:Optional[str]=None
 structs = {
-    "geo": Geo,"per":Per, "mon":Mon, "ent":Ent
+    "geo": Geo,"per":Per, "mon":Mon, "ent":Ent, "queries":Queries
 }
 
 class QMO:
@@ -498,10 +506,15 @@ class QMO:
         return res_json
     
     def searches(self) -> dict:
-        qu = self.cur.execute("SELECT * FROM queries ORDER BY date;")
+        qu = self.cur.execute("SELECT * FROM queries ORDER BY date DESC;")
         res = {}
-        res["data"] = map(lambda row:structs[self.dataset](*row),qu)
-        return res
+        result = {"data":[]}
+        # res["data"] = map(lambda row:structs[self.dataset](*row),qu)
+        res["data"] = map(lambda row:dict(zip(self.available_fields, row)),qu)
+        for r in res["data"]:
+            r["plan"] = list(self.cur.execute(f"EXPLAIN QUERY PLAN {r.get('query')}"))[0][3]
+            result["data"].append(r)
+        return result
         
     def enter(self, query:str, length:int, date:str, ip:str, dataset:str, time:float):
         query_str = f'''
@@ -555,16 +568,3 @@ class QMO:
                 res_json["success"] = True
                 res_json["time"] = time.perf_counter() - s
                 return res_json
-
-    def write_csv(self, file_name: str, data):
-        with open(f"download/{file_name}", "w", encoding="utf-8") as file:
-            fields = data[0].__struct_fields__
-            csv_writer = csv.writer(file, delimiter=";")
-            csv_writer.writerow(fields)
-
-            for record in data:
-                to_write = []
-                for f in fields:
-                    to_write.append(eval(f"{record}.{f}"))
-                    
-                csv_writer.writerow(to_write)

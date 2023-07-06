@@ -47,10 +47,7 @@ def r_query(model):
         print(data["length"])
         now = dt.datetime.now()
         if request.url.find("csv") >= 0:
-            os.system("rm -r download/*.csv")
-            file_name = f"{now.year}{now.month}{now.day}{model}.csv"
-            test_QMO.write_csv(file_name,data["data"])
-            return send_file(f"{os.getcwd()}/download/{file_name}", as_attachment=True)
+            return render_template("csv.html", dataset=model)
         try:
             test_QMO.enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"])
         except:
@@ -107,7 +104,7 @@ def r_blunt_query(model):
 
 @api.route("/searchesD2z2UAdAydEX1")
 def r_test():
-    test_qmo = QMO("per")
+    test_qmo = QMO("queries")
     data = test_qmo.searches()
     data = tuple(data["data"])
     data = msgspec.json.encode(data)

@@ -3,15 +3,13 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 import re
 
-file_name = "converter/geo_flat.txt"
-file_to_write ="converter/_geo.json"
+file_name = "converter/ent_flat.txt"
+file_to_write ="converter/ent.json"
 
 if __name__ == '__main__':
     import time
     start = time.perf_counter()
     file = open(file_name, encoding="utf-8", errors="ignore")
-    # files = os.listdir("geo_parse")
-    # files = map(lambda file: open(f"geo_parse/{file}"), files)
     result = []
     id_bne = None
     record = {}
