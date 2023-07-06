@@ -470,16 +470,20 @@ class QMO:
         # print(fields)
         query = f"SELECT {fields} FROM {self.dataset}_fts "
         if res_json.get("dataset_2"):
-            query = query.replace("_fts", "")
+            query += " WHERE per_id IN (SELECT id from per_fts "
             print("ON JOINING")
             joining_dict = self.joining(res_json["dataset_2"])
-            joining_where = self.where_fts(joining_dict["per"], "per")
-            where_dataset = self.where(res_json["args"].items())
-            where_dataset = where_dataset.replace("WHERE", " AND ")
-            joining_where = joining_where.replace("WHERE", f"INNER JOIN per_fts ON per_fts.id = mon.per_id  WHERE ")
-            if where_dataset:
-                joining_where += where_dataset
-            query += joining_where
+            d_2_where = self.where_fts(joining_dict["per"], "per")
+            query += d_2_where +")"
+            d_1_where = self.where_fts(res_json["args"].items())
+            if d_1_where:
+                d_1_where = d_1_where.replace("WHERE", "")
+                query += f" AND ({d_1_where})"
+            # where_dataset = where_dataset.replace("WHERE", " AND ")
+            # joining_where = joining_where.replace("WHERE", f"WHERE per_id in (select id from per_fts WHERE ")
+            # if where_dataset:
+            #     joining_where += d_1_where
+            # query += joining_where
 
         else:
             query += self.where_fts(res_json["args"].items())
