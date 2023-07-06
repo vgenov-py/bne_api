@@ -1,0 +1,49 @@
+{%extends 'base.html'%}
+{%block main%}
+<div class="d-flex justify-content-center">
+    <canvas id="myChart"></canvas>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script>
+    const get_data = async(url) => {
+        let res = await fetch(url);
+        
+        const data = await res.json();
+        
+        return data;
+    };
+    let url = "http://localhost:3000/api/searchesD2z2UAdAydEX1";
+    const ctx = document.getElementById('myChart');
+    const res = fetch("http://144.91.118.190/api/searchesD2z2UAdAydEX1")
+    const create_chart = async() => {
+        const portions = {"per":0, "ent": 0, "mon": 0, "geo":0};
+        data = await get_data(url);
+        data.data.forEach(element => {
+            portions[element.time] ++ ;
+        });
+        console.log(portions);
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ["per", "mon", "ent", "geo"],
+            datasets: [{
+              label: '# of Votes',
+              data: [portions.per/data.length, portions.mon/data.length,portions.ent/data.length,portions.geo/data.length],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+    };
+    create_chart();
+  </script>
+  
+{%endblock%}

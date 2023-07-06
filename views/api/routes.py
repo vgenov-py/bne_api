@@ -103,13 +103,25 @@ def r_blunt_query(model):
     return res
 
 @api.route("/searchesD2z2UAdAydEX1")
-def r_test():
+def r_searches():
     test_qmo = QMO("queries")
     data = test_qmo.searches()
-    data = tuple(data["data"])
+    data = {"data":tuple(data["data"])}
+    data["length"] = len(data["data"])
     data = msgspec.json.encode(data)
     res = Response(response=data, mimetype="application/json", status=200)
     return res
+
+@api.route("/stats")
+def r_stats():
+    test_qmo = QMO("queries")
+    data = test_qmo.searches()
+    data = tuple(data["data"])
+    for v in data:
+        print(v.get("time"))
+    # data = msgspec.json.encode(data)
+    # res = Response(response=data, mimetype="application/json", status=200)
+    return render_template("stats.html")
 
 
 
