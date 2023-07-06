@@ -875,7 +875,8 @@ class MMO:
             s = time.perf_counter()
             data = json.loads(file.read())
             data = data
-            query = f"insert or ignore into {self.dataset} values ({'?, '*len(self.available_fields)})"
+            query = f"insert or ignore into {self.dataset}_fts values ({'?, '*len(self.available_fields)})"
+            print(self.available_fields)
             query = query.replace(", )", ")")
             print(query.center(50 + len(query), "#"))
             self.cur.executemany(query,map(lambda record: self.extract_values(self.dataset, record), data))

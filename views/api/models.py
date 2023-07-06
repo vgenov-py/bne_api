@@ -401,8 +401,8 @@ create_statements = {
     "geo": query_create_geo, 
     "mon": query_create_mon, 
     "ent": query_create_ent,
-    "per_fts": query_create_per, 
-    "geo_fts": query_create_geo, 
-    "mon_fts": query_create_mon, 
-    "ent_fts": query_create_ent
+    "per_fts": query_create_per_fts, 
+    "geo_fts": query_create_geo_fts, 
+    "mon_fts": query_create_mon_fts, 
+    "ent_fts": query_create_ent_fts
     }
