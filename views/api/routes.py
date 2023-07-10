@@ -117,8 +117,6 @@ def r_stats():
     test_qmo = QMO("queries")
     data = test_qmo.searches()
     data = tuple(data["data"])
-    for v in data:
-        print(v.get("time"))
     # data = msgspec.json.encode(data)
     # res = Response(response=data, mimetype="application/json", status=200)
     return render_template("stats.html")

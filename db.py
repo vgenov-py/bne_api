@@ -351,7 +351,7 @@ class QMO:
         if dataset supplied, will build the query based on a different dataset from the one available on self properties
         '''
         dataset = dataset if dataset else self.dataset  
-        print(dataset, "XX", self.dataset)
+        # print(dataset, "XX", self.dataset)
         args = dict(args)
         if not args:
             return ""
@@ -465,13 +465,10 @@ class QMO:
         else:
             for field in fields.split(" "):
                 if field.find("NULL") >= 0:
-                    # print(f"{field}_fts")
                     pass
-        # print(fields)
         query = f"SELECT {fields} FROM {self.dataset}_fts "
         if res_json.get("dataset_2"):
             d_2 = list(res_json["dataset_2"].keys())[0]
-            print(d_2)
             query += f" WHERE {'per_id' if d_2 == 'per' else 'id'} IN (SELECT {'id' if d_2 == 'per' else 'per_id'} from {d_2}_fts "
             print("ON JOINING")
             joining_dict = self.joining(res_json["dataset_2"])

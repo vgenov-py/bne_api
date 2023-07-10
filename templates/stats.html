@@ -1,6 +1,7 @@
 {%extends 'base.html'%}
 {%block main%}
-<div class="d-flex justify-content-center">
+<div class="d-flex justify-content-center mx-auto flex-column" style="width: 500px;">
+    <h3 class="mx-auto">Distribución de llamadas</h3>
     <canvas id="myChart"></canvas>
   </div>
   
@@ -15,8 +16,10 @@
         return data;
     };
     let url = "http://144.91.118.190/api/searchesD2z2UAdAydEX1";
+    // let url = "http://localhost:3000/api/searchesD2z2UAdAydEX1";
     const ctx = document.getElementById('myChart');
-    const res = fetch("http://144.91.118.190/api/searchesD2z2UAdAydEX1")
+
+
     const create_chart = async() => {
         const portions = {"per":0, "ent": 0, "mon": 0, "geo":0};
         data = await get_data(url);
@@ -25,11 +28,11 @@
         });
         console.log(portions);
         new Chart(ctx, {
-          type: 'bar',
+          type: 'pie',
           data: {
             labels: ["per", "mon", "ent", "geo"],
             datasets: [{
-              label: '# of Votes',
+              label: 'Distribución de llamadas',
               data: [portions.per/data.length, portions.mon/data.length,portions.ent/data.length,portions.geo/data.length],
               borderWidth: 1
             }]
