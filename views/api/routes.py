@@ -9,6 +9,8 @@ import msgspec
 import csv
 import orjson as json
 import os
+import requests as req
+
 api = Blueprint("api", __name__)
 '''
 
@@ -120,15 +122,47 @@ def t_errors():
     
 @api.route("/schema")
 def t_schema():
-    return render_template("schema.html")
+    dataset = request.args.get("dataset")
+    fields = {
+        "per":
+        [
+            {
+                "name":"Otros identificadores",
+                "t": "024",
+                "description": "Identificadores de la persona en otros catálogos (viaf, lcnf, isni, etc.)",
+                "t_description": "|2: |a "
+            },
+            {
+                "name": "Nombre de persona",
+                "t": "100",
+                "description": "Nombre de persona",
+                "t_description": "|a{|b|c}(|d)(|q)"
+            },
+            {
+                "name": "Fecha nacimiento",
+                "t": "046",
+                "description": "Fecha de nacimiento de la persona",
+                "t_description": "Sólo contenido de |f"
+            },
+            {
+                "name": "Fecha de muerte",
+                "t": "046",
+                "description": "Fecha de muerte de la persona",
+                "t_description": "Sólo contenido de |g"
+            }
+        ]
+    }
+    if dataset:
+        if fields.get(dataset):
+            return render_template("schema.html", fields=fields[dataset])
+    return render_template("schema.html", fields=fields["per"])
+        
 
 @api.route("/stats")
 def t_stats():
     test_qmo = QMO("queries")
     data = test_qmo.searches()
     data = tuple(data["data"])
-    # data = msgspec.json.encode(data)
-    # res = Response(response=data, mimetype="application/json", status=200)
     return render_template("stats.html")
 
 

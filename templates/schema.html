@@ -2,15 +2,17 @@
 {%block main%}
 <div class="d-flex justify-content-center">
     <ul class="list-group mx-4" style="width: 350px;">
-        <li class="list-group-item t_100" role="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Descripción del campo nombre de persona" onmouseover="show_t(this)" onmouseout="show_t(this, true)">Nombre de persona</li>
-        <li class="list-group-item" role="button">Profesión</li>
-        <li class="list-group-item" role="button">Género</li>
+        {%for field in fields%}
+            <li class="list-group-item {{field.t}}" role="button" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="{{field.description}}" onmouseover="show_t(this)" onmouseout="show_t(this, true)">{{field.name}}</li>
+        {%endfor%}
     </ul>
     
     <ul class="list-group mx-4" style="width: 350px;">
-        <li class="list-group-item t_100" role="button">100</li>
-        <li class="list-group-item" role="button">372</li>
-        <li class="list-group-item" role="button">375</li>
+        {%for field in fields%}
+            <li class="list-group-item {{field.t}}" role="button" onmouseover="show_t(this)" onmouseout="show_t(this, true)" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="{{field.t_description}}">{{field.t}}</li>            
+        {%endfor%}
+        <!-- <li class="list-group-item t_100" role="button">100</li>
+        <li class="list-group-item" role="button">372</li> -->
     </ul>
 </div>
 <script>
@@ -19,9 +21,10 @@
     const show_t = (element, deactivate) => {
         const t = element.className.substring(element.className.length -5, element.className.length);
         [...document.getElementsByClassName(element.className)].forEach((element) => {
-            element.className = `list-group-item active ${t}`; 
+            element.className = `list-group-item active ${t}`;
+            
             if (deactivate) {
-                element.className = `list-group-item ${t}`; 
+                element.className = `list-group-item ${t}`;
             };
         });
     };
