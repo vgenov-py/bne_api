@@ -112,6 +112,11 @@ def r_searches():
     res = Response(response=data, mimetype="application/json", status=200)
     return res
 
+@api.route("/errorsD2z2UAdAydEX2")
+def r_errors():
+    with open("/var/log/bne_api/bne_api.err.log") as file:
+        return file.read()
+
 @api.route("/stats")
 def r_stats():
     test_qmo = QMO("queries")
