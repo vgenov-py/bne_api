@@ -115,7 +115,8 @@ def r_searches():
 @api.route("/errorsD2z2UAdAydEX2")
 def r_errors():
     with open("/var/log/bne_api/bne_api.err.log") as file:
-        return file.read()
+        data = file.readlines()
+        return render_template("errors_log.html",data=data)
 
 @api.route("/stats")
 def r_stats():
