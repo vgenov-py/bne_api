@@ -113,13 +113,17 @@ def r_searches():
     return res
 
 @api.route("/errorsD2z2UAdAydEX2")
-def r_errors():
+def t_errors():
     with open("/var/log/bne_api/bne_api.err.log") as file:
         data = file.readlines()
         return render_template("errors_log.html",data=data)
+    
+@api.route("/schema")
+def t_schema():
+    return render_template("schema.html")
 
 @api.route("/stats")
-def r_stats():
+def t_stats():
     test_qmo = QMO("queries")
     data = test_qmo.searches()
     data = tuple(data["data"])
