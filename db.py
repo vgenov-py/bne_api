@@ -526,7 +526,6 @@ class QMO:
     def enter(self, query:str, length:int=None, date:str=None, dataset:str=None, time:float=None,is_from_web:bool=False ,error:bool=None, update:bool=False):
         if update:
             last_id = tuple(self.cur.execute("SELECT id FROM queries ORDER BY date LIMIT 1;"))[0][0]
-            print(f"LAST ID: {last_id}")
             query_str = f'''
                         UPDATE queries SET length = ?, date=?, dataset=?, time=?, is_from_web=?, error=0 WHERE id = '{last_id}';
                         '''
