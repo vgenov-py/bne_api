@@ -1,55 +1,47 @@
 fields = {
-    "geo": [
-        {
-            "name":"otros_identificadores",
-            "t": "024",
-            "description": "Identificadores de la persona en otros catálogos (viaf, lcnf, isni, etc.)",
-            "t_description": "$2: ($a) "
-        }
-    ],
-    "per":
+       "per":
     [
         {
             "name":"otros_identificadores",
             "t": "024",
             "description": "Identificadores de la persona en otros catálogos (viaf, lcnf, isni, etc.)",
-            "t_description": "$2: ($a) "
+            "t_description": "$2: $a "
         },
         {
             "name": "fecha_nacimiento",
             "t": "046",
             "description": "Fecha de nacimiento de la persona",
-            "t_description": "Sólo contenido de $f"
+            "t_description": "$f"
         },
         {
             "name": "fecha_muerte",
             "t": "_2046",
             "description": "Fecha de muerte de la persona",
-            "t_description": "Sólo contenido de $g"
+            "t_description": "$g"
         },
         {
             "name": "nombre_de_persona",
             "t": "100",
             "description": "Nombre de persona",
-            "t_description": "$a{$b$c}($d)($q)"
+            "t_description": "$a,$b,$c($d)($q)"
         },
         {
             "name": "otros_atributos_persona",
             "t": "368",
             "description": "Título, cargo, etc. ",
-            "t_description": "sólo contenido de $c$d"
+            "t_description": "$c$d"
         },
         {
             "name": "lugar_nacimiento",
             "t": "370",
             "description": "País, región, provincia y localidad donde ha nacido la persona",
-            "t_description": "Sólo contenido de $a"
+            "t_description": "$a"
         },
         {
             "name": "lugar_muerte",
             "t": "_2370",
             "description": "País, región, provincia y localidad donde ha fallecido la persona",
-            "t_description": "Sólo contenido de $b"
+            "t_description": "$b"
         },
         {
             "name": "pais_relacionado",
@@ -73,61 +65,61 @@ fields = {
             "name": "campo_actividad",
             "t": "372",
             "description": "Disciplina o actividad a la que se dedica la persona",
-            "t_description": "Sólo contenido de $a"
+            "t_description": "$a"
         },
         {
             "name": "grupo_o_entidad relacionada",
             "t": "373, 510",
             "description": "Grupo, organismo, etc., a la que pertenece la persona",
-            "t_description": "373, sólo contenido de $a; 510, $a$b"
+            "t_description": "373, $a; 510, $a$b"
         },
         {
             "name": "ocupacion",
             "t": "374",
             "description": "Profesión desempeñada por la persona",
-            "t_description": "Sólo contenido de $a"
+            "t_description": "$a"
         },
         {
             "name": "genero",
             "t": "375",
             "description": "Género de la persona (masculino, femenino u otros)",
-            "t_description": "Sólo contenido de $a"
+            "t_description": "$a"
         },
         {
             "name": "lengua",
             "t": "377",
             "description": "Lengua en la que la persona escribe la mayor parte de su obra",
-            "t_description": "Sólo contenido de $l"
+            "t_description": "$l"
         },
         {
             "name": "otros_nombres",
             "t": "400",
             "description": "Otros nombres por los que es conocida la persona",
-            "t_description": "$a{$b$c}($d)($q)"
+            "t_description": "$a,$b,$c($d)($q)"
         },
         {
             "name": "persona_relacionada",
             "t": "500",
             "description": "Otras personas relacionadas con la persona",
-            "t_description": "$a{$b$c}($d)($q)"
+            "t_description": "$a,$b,$c($d)($q)"
         },
         {
             "name": "nota_general",
             "t": "667",
             "description": "Más información sobre la persona",
-            "t_description": "$a{$b$c}($d)($q)"
+            "t_description": "$a"
         },
         {
             "name": "fuentes_de_informacion",
             "t": "670",
             "description": "Fuentes de información de las que se han obtenido los datos de la persona",
-            "t_description": "$a: $b ($u))"
+            "t_description": "$a: $b ($u)"
         },
         {
             "name": "otros_datos_biográficos",
             "t": "678",
             "description": "Otra información biográfica de la persona",
-            "t_description": "$a: $b ($u))"
+            "t_description": "$a"
         },
     ],
     "mon": [
@@ -195,13 +187,13 @@ fields = {
             "name": "cdu",
             "t": "080",
             "description": "Número de la Clasificación Decimal Universalque representa el tema tratado en la monografía",
-            "t_description": "Sólo contenido de $a"
+            "t_description": "$a"
         },
         {
             "name": "autores",
             "t": "100, 110, 700, 710",
             "description": "Responsables del contenido intelectual de la monografía",
-            "t_description": "$a{$b$c}($d)($q)($e)"
+            "t_description": "$a,$b,$c($d)($q)($e)"
         },
         {
             "name": "titulo",
@@ -297,19 +289,19 @@ fields = {
             "name": "tema",
             "t": "600, 610, 611, 630, 650, 651, 653",
             "description": "Materia sobre la que trata la monografía",
-            "t_description": "Todos los subbcampos menos $2 subcampos separados por guiones"
+            "t_description": "Todos los subcampos excepto $2"
         },
         {
             "name": "genero_forma",
             "t": "655",
             "description": "Género al que pertenece la obra y forma que toma",
-            "t_description": "Todos los subbcampos menos $2 subcampos separados por guiones"
+            "t_description": "Todos los subcampos excepto $2"
         },
         {
             "name": "tipo_ de_documento",
             "t": "994",
-            "description": "MONOMODER",
-            "t_description": '"si $aMONOMODER: "Monografía en papel (posterior a 1830)" ∂si $aMONOMODER-RECELE: "Monografía electrónica""',
+            "description": "tipo de monografía (en papel o electrónica)",
+            "t_description": '$a',
         }
     ],
     "ent": [
@@ -323,85 +315,85 @@ fields = {
             "name": "fecha_establecimiento",
             "t": "046",
             "description": "Fecha de creación o inicio de actividad de la entidad",
-            "t_description": "Si hay  $q: sólo $q (aunque haya más $) Si no hay $q, $s si lo hay",
+            "t_description": "$q (o $s)",
         },
         {
             "name": "fecha_finalizacion",
             "t": "_2046",
             "description": "Fecha de desapaprición o cese de actividad de la entidad",
-            "t_description": "Si hay  $r: sólo $r (aunque haya más $) Si no hay $r, $t si lo hay",
+            "t_description": "$r (o $t)",
         },
         {
             "name": "nombre_de_entidad",
             "t": "110",
             "description": "Nombre de la entidad corporativa",
-            "t_description": "$a,$b, $b...($e)",
+            "t_description": "$a,$b, $b...",
         },
         {
             "name": "tipo_entidad",
             "t": "368",
             "description": "tipo de entidad corporativa",
-            "t_description": "Sólo contenido de $a",
+            "t_description": "$a",
         },
         {
             "name": "pais",
             "t": "370",
             "description": "País relacionado con la entidad",
-            "t_description": "Sólo contenido de $c",
+            "t_description": "$c",
         },
         {
             "name": "sede",
             "t": "_2370",
             "description": "Lugar donde se encuentra la sede de la entidad, si es especialmente significativo",
-            "t_description": "Sólo contenido de $e",
+            "t_description": "$e",
         },
         {
             "name": "campo_actividad",
             "t": "372",
             "description": "Disciplina o actividad a la que se dedica la entidad",
-            "t_description": "Sólo contenido de $a",
+            "t_description": "$a",
         },
         {
             "name": "lengua",
             "t": "377",
             "description": "Lengua en la que la entidad suele publicar",
-            "t_description": "Sólo contenido de $l",
+            "t_description": "$l",
         },
         {
             "name": "otros_nombres",
             "t": "410",
             "description": "Otros nombres por los que es conocida la entidad",
-            "t_description": "$a,$b, $b...($e)",
+            "t_description": "$a,$b, $b...",
         },
         {
             "name": "persona_relacionada",
             "t": "500",
             "description": "Personas relacionadas con la entidad",
-            "t_description": "$a{$b$c}($d)($q)",
+            "t_description": "$a,$b,$c($d)($q)",
         },
         {
             "name": "grupo_o_entidad_relacionada",
             "t": "510",
             "description": "Grupo, organismo, etc., relacionado con la entidad",
-            "t_description": "$a,$b, $b...($e)",
+            "t_description": "$a,$b, $b...",
         },
         {
             "name": "nota_de_relacion",
             "t": "663",
             "description": "Otras relaciones de la entidad con personas, otras entidades, etc.",
-            "t_description": "$a $b(puede haber varios $b",
+            "t_description": "$a,$b,$b...",
         },
         {
             "name": "otros_datos_historicos",
             "t": "665, 678",
             "description": "Otra información histórica de la entidad",
-            "t_description": "Sólo contenido de $a",
+            "t_description": "$a",
         },
         {
             "name": "nota_general",
             "t": "667",
             "description": "Más información sobre la entidad",
-            "t_description": "Sólo contenido de $a",
+            "t_description": "$a",
         },
         {
             "name": "fuentes_de_informacion",
@@ -412,7 +404,7 @@ fields = {
         {
             "name": "otros_datos_historicos",
             "t": "_2678",
-            "description": "Sólo contenido de $a",
+            "description": "$a",
             "t_description": "otra información histórica de la entidad",
         }
     ]
