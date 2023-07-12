@@ -494,6 +494,10 @@ class QMO:
             lines = file.readlines()
             lines.extend(f"\n{dt.datetime.now()} | {query}\n")
             file.writelines(lines)
+        '''
+        saving query:
+        '''
+        self.enter(query)
         try:
             res = self.cur.execute(query)
         except sqlite3.OperationalError as e:
@@ -519,20 +523,30 @@ class QMO:
             result["data"].append(r)
         return result
         
-    def enter(self, query:str, length:int, date:str, ip:str, dataset:str, time:float):
-        query_str = f'''
-                INSERT INTO queries VALUES(
-                '{uuid4().hex}',
-                "{query}",
-                {length},
-                '{date}',
-                '{ip}',
-                '{dataset}',
-                {time}
-                )
-                '''
-        self.cur.execute(query_str)
-        self.con.commit()
+    def enter(self, query:str, length:int=None, date:str=None, ip:str=None, dataset:str=None, time:float=None, error:bool=None, update:bool=False):
+        if update:
+            last_id = tuple(self.cur.execute("SELECT id FROM queries ORDER BY date LIMIT 1;"))[0][0]
+            print(f"LAST ID: {last_id}")
+            query_str = f'''
+                        UPDATE queries SET length = ?, date=?, dataset=?, time=?, is_from_web=?, error=1 WHERE id = '{last_id}';
+                        '''
+            self.cur.execute(query_str, (length, date, dataset, time, False))
+            self.con.commit()
+        else:
+            query_str = f'''
+                    INSERT INTO queries VALUES(
+                    '{uuid4().hex}',
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                    )
+                    '''
+            self.cur.execute(query_str, (query, length, date, ip, dataset, time, error))
+            self.con.commit()
     
     def blunt_query(self):
         query: str = self.args.get("query")
