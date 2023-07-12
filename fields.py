@@ -6,7 +6,7 @@ fields = {
             "name":"otros_identificadores",
             "t": "024",
             "description": "Identificadores de la persona en otros catálogos (viaf, lcnf, isni, etc.)",
-            "t_description": "$2: ($a) "
+            "t_description": "$2: $a"
         },
         {
             "name": "fecha_nacimiento",
