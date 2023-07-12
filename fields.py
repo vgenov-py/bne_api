@@ -127,5 +127,187 @@ fields = {
             "description": "Otra información biográfica de la persona",
             "t_description": "|a: |b (|u))"
         },
+    ],
+    "mon": [
+        {
+            "name": "pais_de_publicacion",
+            "t": "008",
+            "description": "País donde se ha publicado la monografía",
+            "t_description": "008/15-17"
+        },
+        {
+            "name": "lengua_principal",
+            "t": "_2008",
+            "description": "Lengua del contenido principal del documento",
+            "t_description": "008/35-37"
+        },
+        {
+            "name": "otras_lenguas",
+            "t": "041",
+            "description": "Lenguas de otros contenidos (resúmenes, tablas de contenidos, notas, etc.)",
+            "t_description": "|b, |d, |f,|j,|k"
+        },
+        {
+            "name": "lengua_original",
+            "t": "_2041",
+            "description": "Lengua original de la que se ha traducido",
+            "t_description": "|h"
+        },
+        {
+            "name": "fecha_de_publicacion",
+            "t": "_3008",
+            "description": "Fecha en que se publicó la monografía o su primera entrega en caso de una monografía en varias partes",
+            "t_description": "008/7-10"
+        },
+        {
+            "name": "decada",
+            "t": "_4008",
+            "description": "Década en la que se publicó la monografía o su primera entrega en caso de una monografía en varias partes",
+            "t_description": "A partir de fecha_de_publicacion"
+        },
+        {
+            "name": "siglo",
+            "t": "_5008",
+            "description": "Siglo en el  que se publicó la monografía o su primera entrega en caso de una monografía en varias partes",
+            "t_description": "A partir de fecha_de_publicacion"
+        },
+        {
+            "name": "deposito_legal",
+            "t": "017",
+            "description": "Número de Depósito Legal",
+            "t_description": "|a"
+        },
+        {
+            "name": "isbn",
+            "t": "020",
+            "description": "International Standard Book Number",
+            "t_description": "|a (|q) "
+        },
+        {
+            "name": "nipo",
+            "t": "024",
+            "description": "Número de Identificación de Publicaciones Oficiales",
+            "t_description": "|a (|q) "
+        },
+        {
+            "name": "cdu",
+            "t": "080",
+            "description": "Número de la Clasificación Decimal Universalque representa el tema tratado en la monografía",
+            "t_description": "Sólo contenido de |a"
+        },
+        {
+            "name": "autores",
+            "t": "100",
+            "description": "Responsables del contenido intelectual de la monografía",
+            "t_description": "|a{|b|c}(|d)(|q)(|e)"
+        },
+        {
+            "name": "titulo",
+            "t": "245",
+            "description": "Título de la obra tal y como aparece citado en la monografía",
+            "t_description": "|a:|b.|n,|p"
+        },
+        {
+            "name": "mencion_de_autores",
+            "t": "_2245",
+            "description": "Responsables del contenido intelectual tal y como aparecen citados en la monografía",
+            "t_description": "|c"
+        },
+        {
+            "name": "otros_titulos",
+            "t": "246",
+            "description": "Otros títulos de la obra que aparecen citados en la monografía",
+            "t_description": "[|i]:|a:|b.|n,|p"
+        },
+        {
+            "name": "edicion",
+            "t": "250",
+            "description": "Información sobre la edición",
+            "t_description": "|a,|b"
+        },
+        {
+            "name": "lugar_de_publicacion",
+            "t": "260",
+            "description": "Localidad específica en la que se ha publicado la monografía",
+            "t_description": "|a"
+        },
+        {
+            "name": "editorial",
+            "t": "260",
+            "description": "Nombre del editor responsable de la publicación de la monografía",
+            "t_description": "|b"
+        },
+        {
+            "name": "extension",
+            "t": "300",
+            "description": "Número de volúmenes, páginas, hojas, columnas, etc.",
+            "t_description": "|a"
+        },
+        {
+            "name": "otras_caracteristicas_fisicas",
+            "t": "_2300",
+            "description": "Ilustraciones, color, etc.",
+            "t_description": "|b"
+        },
+        {
+            "name": "dimensiones",
+            "t": "_3300",
+            "description": "Medida del alto de la publicación (en cm)",
+            "t_description": "|c"
+        },
+        {
+            "name": "material_anejo",
+            "t": "_4300",
+            "description": "Material complementario que acompaña a la publicación principal",
+            "t_description": "|e"
+        },
+        {
+            "name": "serie",
+            "t": "440",
+            "description": "Colección a la que pertenece la monografía",
+            "t_description": "|a|v"
+        },
+        {
+            "name": "nota_de_contenido",
+            "t": "505",
+            "description": "Más información sobre el contenido de la obra",
+            "t_description": "|a"
+        },
+        {
+            "name": "notas",
+            "t": "500",
+            "description": "Más información sobre la monografía",
+            "t_description": "|a"
+        },
+        {
+            "name": "procedencia",
+            "t": "561",
+            "description": "Nombre del último propietario del ejemplar antes de pasar a la BNE",
+            "t_description": "|a"
+        },
+        {
+            "name": "premios",
+            "t": "586",
+            "description": "Premios con los que ha sido galardonada la obra",
+            "t_description": "|a"
+        },
+        {
+            "name": "tema",
+            "t": "600",
+            "description": "Materia sobre la que trata la monografía",
+            "t_description": "Todos los subbcampos menos |2 subcampos separados por guiones"
+        },
+        {
+            "name": "genero_forma",
+            "t": "655",
+            "description": "Género al que pertenece la obra y forma que toma",
+            "t_description": "Todos los subbcampos menos |2 subcampos separados por guiones"
+        },
+        {
+            "name": "tipo_ de_documento",
+            "t": "994",
+            "description": "MONOMODER",
+            "t_description": '"si |aMONOMODER: "Monografía en papel (posterior a 1830)" ∂si |aMONOMODER-RECELE: "Monografía electrónica""',
+        }
     ]
 }
