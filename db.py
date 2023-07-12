@@ -497,7 +497,7 @@ class QMO:
         '''
         saving query:
         '''
-        self.enter(query, error=True)
+        self.enter(query, error=True, date=dt.datetime.now(), dataset=self.dataset)
         try:
             res = self.cur.execute(query)
         except sqlite3.OperationalError as e:
