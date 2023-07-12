@@ -497,7 +497,7 @@ class QMO:
         '''
         saving query:
         '''
-        self.enter(query)
+        self.enter(query, error=True)
         try:
             res = self.cur.execute(query)
         except sqlite3.OperationalError as e:
@@ -523,12 +523,12 @@ class QMO:
             result["data"].append(r)
         return result
         
-    def enter(self, query:str, length:int=None, date:str=None, ip:str=None, dataset:str=None, time:float=None, error:bool=None, update:bool=False):
+    def enter(self, query:str, length:int=None, date:str=None, dataset:str=None, time:float=None,is_from_web:bool=False ,error:bool=None, update:bool=False):
         if update:
             last_id = tuple(self.cur.execute("SELECT id FROM queries ORDER BY date LIMIT 1;"))[0][0]
             print(f"LAST ID: {last_id}")
             query_str = f'''
-                        UPDATE queries SET length = ?, date=?, dataset=?, time=?, is_from_web=?, error=1 WHERE id = '{last_id}';
+                        UPDATE queries SET length = ?, date=?, dataset=?, time=?, is_from_web=?, error=0 WHERE id = '{last_id}';
                         '''
             self.cur.execute(query_str, (length, date, dataset, time, False))
             self.con.commit()
@@ -545,7 +545,7 @@ class QMO:
                     ?
                     )
                     '''
-            self.cur.execute(query_str, (query, length, date, ip, dataset, time, error))
+            self.cur.execute(query_str, (query, length, date, dataset, time,is_from_web ,error))
             self.con.commit()
     
     def blunt_query(self):

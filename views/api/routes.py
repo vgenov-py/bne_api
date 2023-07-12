@@ -51,7 +51,7 @@ def r_query(model):
         if request.url.find("csv") >= 0:
             return render_template("csv.html", dataset=model)
         try:
-            test_QMO.enter(data["query"], data["length"], now, request.environ['REMOTE_ADDR'], model, data["time"],0 ,True)
+            test_QMO.enter(data["query"], data["length"], now, model, data["time"],False, False, True)
         except Exception as e:
             print(e)
         data.pop("query")
