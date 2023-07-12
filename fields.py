@@ -137,7 +137,7 @@ fields = {
         },
         {
             "name": "otras_lenguas",
-            "t": "041",
+            "t": "_1041",
             "description": "Lenguas de otros contenidos (resúmenes, tablas de contenidos, notas, etc.)",
             "t_description": "|b, |d, |f,|j,|k"
         },
@@ -227,7 +227,7 @@ fields = {
         },
         {
             "name": "editorial",
-            "t": "260, 264",
+            "t": "_2260, 264",
             "description": "Nombre del editor responsable de la publicación de la monografía",
             "t_description": "|b"
         },

@@ -72,12 +72,13 @@
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     const show_t = (element, deactivate) => {
-        const t = element.className.substring(element.className.length -5, element.className.length);
+        // const t = element.className.substring(element.className.length -5, element.className.length);
+        const t = element.className.match(/\d{1,}, \d{1,}|\d{1,}|_\d{1,}, \d{1,}|\d/);
         [...document.getElementsByClassName(element.className)].forEach((element) => {
-            element.className = `list-group-item active ${t}`;
+            element.className = `list-group-item active ${t[0]}`;
             element.click()
             if (deactivate) {
-                element.className = `list-group-item ${t}`;
+                element.className = `list-group-item ${t[0]}`;
             };
         });
     };
