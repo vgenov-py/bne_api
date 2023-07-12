@@ -69,9 +69,9 @@ fields = {
         },
         {
             "name": "grupo_o_entidad relacionada",
-            "t": "373",
+            "t": "373, 510",
             "description": "Grupo, organismo, etc., a la que pertenece la persona",
-            "t_description": "Sólo contenido de |a"
+            "t_description": "373, sólo contenido de |a; 510, |a|b"
         },
         {
             "name": "ocupacion",
@@ -104,12 +104,6 @@ fields = {
             "t_description": "|a{|b|c}(|d)(|q)"
         },
         {
-            "name": "grupo_o_entidad relacionada",
-            "t": "510",
-            "description": "Grupo, organismo, etc., a la que pertenece la persona",
-            "t_description": "|a{|b|c}(|d)(|q)"
-        },
-        {
             "name": "nota_general",
             "t": "667",
             "description": "Más información sobre la persona",
@@ -133,13 +127,13 @@ fields = {
             "name": "pais_de_publicacion",
             "t": "008",
             "description": "País donde se ha publicado la monografía",
-            "t_description": "008/15-17"
+            "t_description": "008:15-17"
         },
         {
             "name": "lengua_principal",
-            "t": "_2008",
+            "t": "_2008, 041",
             "description": "Lengua del contenido principal del documento",
-            "t_description": "008/35-37"
+            "t_description": "008:35-37, 041: $a"
         },
         {
             "name": "otras_lenguas",
@@ -197,7 +191,7 @@ fields = {
         },
         {
             "name": "autores",
-            "t": "100",
+            "t": "100, 110, 700, 710",
             "description": "Responsables del contenido intelectual de la monografía",
             "t_description": "|a{|b|c}(|d)(|q)(|e)"
         },
@@ -215,9 +209,9 @@ fields = {
         },
         {
             "name": "otros_titulos",
-            "t": "246",
+            "t": "246, 740",
             "description": "Otros títulos de la obra que aparecen citados en la monografía",
-            "t_description": "[|i]:|a:|b.|n,|p"
+            "t_description": "246: [|i]:|a:|b.|n,|p 740: $a$n, $p"
         },
         {
             "name": "edicion",
@@ -227,13 +221,13 @@ fields = {
         },
         {
             "name": "lugar_de_publicacion",
-            "t": "260",
+            "t": "260, 264",
             "description": "Localidad específica en la que se ha publicado la monografía",
             "t_description": "|a"
         },
         {
             "name": "editorial",
-            "t": "260",
+            "t": "260, 264",
             "description": "Nombre del editor responsable de la publicación de la monografía",
             "t_description": "|b"
         },
@@ -263,7 +257,7 @@ fields = {
         },
         {
             "name": "serie",
-            "t": "440",
+            "t": "440, 490",
             "description": "Colección a la que pertenece la monografía",
             "t_description": "|a|v"
         },
@@ -275,7 +269,7 @@ fields = {
         },
         {
             "name": "notas",
-            "t": "500",
+            "t": "500, 504, 546, 563, 594",
             "description": "Más información sobre la monografía",
             "t_description": "|a"
         },
@@ -293,7 +287,7 @@ fields = {
         },
         {
             "name": "tema",
-            "t": "600",
+            "t": "600, 610, 611, 630, 650, 651, 653",
             "description": "Materia sobre la que trata la monografía",
             "t_description": "Todos los subbcampos menos |2 subcampos separados por guiones"
         },
